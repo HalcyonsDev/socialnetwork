@@ -32,7 +32,7 @@ public class JwtProvider {
     private final String publicKey;
 
     public JwtProvider(
-            @Value("${spring.application.name}") String issuer,
+            @Value("${jwt.issuer}") String issuer,
             @Value("${jwt.access-token.validity}") int accessTokenValidity,
             @Value("${jwt.access-token.private-key}") String privateKey,
             @Value("${jwt.access-token.public-key}") String publicKey
@@ -68,6 +68,7 @@ public class JwtProvider {
         try {
             Jwts.parser()
                     .verifyWith(getPublicKey())
+                    .requireIssuer(issuer)
                     .build()
                     .parse(accessToken);
 
