@@ -29,6 +29,8 @@
         <module>eureka-server</module>
         <module>redis-cache</module>
         <module>api-gateway</module>
+        <module>subscription-service</module>
+        <module>clients</module>
     </modules>
     <scm>
         <connection/>

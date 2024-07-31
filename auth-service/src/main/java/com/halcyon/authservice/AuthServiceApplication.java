@@ -12,10 +12,12 @@ import org.springframework.context.annotation.Bean;
         scanBasePackages = {
                 "com.halcyon.authservice",
                 "com.halcyon.jwtlibrary",
-                "com.halcyon.rediscache"
+                "com.halcyon.rediscache",
         }
 )
-@EnableFeignClients
+@EnableFeignClients(
+        basePackages = "com.halcyon.clients"
+)
 public class AuthServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthServiceApplication.class, args);

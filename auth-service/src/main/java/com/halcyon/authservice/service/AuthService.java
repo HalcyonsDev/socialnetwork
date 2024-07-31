@@ -2,6 +2,8 @@ package com.halcyon.authservice.service;
 
 import com.halcyon.authservice.exception.*;
 import com.halcyon.authservice.payload.*;
+import com.halcyon.clients.user.UserClient;
+import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.JwtProvider;
 import com.halcyon.jwtlibrary.TokenRevocationService;
 import com.halcyon.rediscache.CacheManager;
@@ -11,12 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.halcyon.authservice.client.UserClient;
 import com.halcyon.authservice.dto.RegisterUserDto;
 import com.halcyon.authservice.dto.ResetPasswordDto;
 import com.halcyon.authservice.security.AuthenticatedDataProvider;
 import com.halcyon.authservice.security.RefreshTokenGenerator;
-import com.halcyon.authservice.payload.User;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
@@ -57,7 +57,7 @@ public class AuthService {
     }
 
     public AuthResponse login(AuthRequest request) {
-        User user = userClient.getByEmail(request.getEmail(), privateSecret);
+        UserResponse user = userClient.getByEmail(request.getEmail(), privateSecret);
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException();
@@ -89,7 +89,7 @@ public class AuthService {
     }
 
     public String forgotPassword(String email) {
-        User user = userClient.getByEmail(email, privateSecret);
+        UserResponse user = userClient.getByEmail(email, privateSecret);
 
         String accessToken = jwtProvider.generateAccessToken(email);
         ForgotPasswordMessage forgotPasswordMessage = new ForgotPasswordMessage(user.getEmail(), accessToken);
@@ -99,7 +99,7 @@ public class AuthService {
     }
 
     public String resetPassword(ResetPasswordDto dto, String token) {
-        User user = userClient.getByEmail(jwtProvider.extractEmail(token), privateSecret);
+        UserResponse user = userClient.getByEmail(jwtProvider.extractEmail(token), privateSecret);
 
         if (!user.isVerified()) {
             throw new UserIsNotVerifiedException();
