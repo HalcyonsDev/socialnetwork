@@ -2,7 +2,7 @@ package com.halcyon.userservice.service;
 
 import com.halcyon.userservice.dto.CreateUserDto;
 import com.halcyon.userservice.dto.UserPasswordResetEvent;
-import com.halcyon.userservice.exception.UserIsNotVerifiedException;
+import com.halcyon.userservice.exception.UnverifiedUserException;
 import com.halcyon.userservice.exception.UserNotFoundException;
 import com.halcyon.userservice.model.User;
 import com.halcyon.userservice.payload.ChangeEmailMessage;
@@ -81,7 +81,7 @@ public class UserService {
 
     private void isVerifiedUser(User user) {
         if (!user.isVerified()) {
-            throw new UserIsNotVerifiedException();
+            throw new UnverifiedUserException("User is not verified. Please confirm your email.");
         }
     }
 }

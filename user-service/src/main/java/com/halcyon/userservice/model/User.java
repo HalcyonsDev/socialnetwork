@@ -1,8 +1,11 @@
 package com.halcyon.userservice.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -32,5 +35,13 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @OneToMany(mappedBy = "owner")
+    @JsonBackReference
+    private List<Subscription> subscriptions;
+
+    @OneToMany(mappedBy = "target")
+    @JsonBackReference
+    private List<Subscription> subscribers;
 }
 

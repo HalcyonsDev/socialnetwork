@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changeset/V1_0_0__create_users_table.sql
+  - include:
+      file: db/changelog/changeset/V1_0_0__create_subscriptions_table.sql
