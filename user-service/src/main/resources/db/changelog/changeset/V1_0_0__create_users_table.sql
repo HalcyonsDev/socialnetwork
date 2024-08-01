@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL,
     about VARCHAR(500) NOT NULL,
     password VARCHAR(500) NOT NULL,
-    is_verified BOOLEAN NOT NULL
+    is_verified BOOLEAN NOT NULL,
+    is_banned BOOLEAN NOT NULL
 )

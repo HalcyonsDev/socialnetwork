@@ -19,6 +19,14 @@ public class EmailUtil {
         );
     }
 
+    public static String getUserIsBanendMessage(String username) {
+        return String.format(
+                "Hello, %s!\n\nYou are banned for a large number of strikes from other users\n\n%s",
+                username,
+                SUPPORT_TEAM
+        );
+    }
+
     private static String getVerificationUrl(String host, String token) {
         return host + "/api/v1/auth?token=" + token;
     }

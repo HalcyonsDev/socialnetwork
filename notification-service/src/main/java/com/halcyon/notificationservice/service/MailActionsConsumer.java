@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halcyon.notificationservice.payload.ForgotPasswordMessage;
 import com.halcyon.notificationservice.payload.NewEmailVerificationMessage;
+import com.halcyon.notificationservice.payload.UserIsBannedMessage;
 import com.halcyon.notificationservice.payload.VerificationMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -46,6 +47,18 @@ public class MailActionsConsumer {
         try {
             verificationMessage = objectMapper.readValue(message, NewEmailVerificationMessage.class);
             mailService.sendNewEmailVerificationMessage(verificationMessage);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @KafkaListener(topics = "sendUserIsBannedMessage", groupId = "notifications")
+    public void listenSendUserIsBannedMessage(String message) {
+        UserIsBannedMessage userIsBannedMessage;
+
+        try {
+            userIsBannedMessage = objectMapper.readValue(message, UserIsBannedMessage.class);
+            mailService.sendUserIsBannedMessage(userIsBannedMessage);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

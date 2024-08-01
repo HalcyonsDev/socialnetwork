@@ -2,19 +2,22 @@ package com.halcyon.userservice.service;
 
 import com.halcyon.userservice.dto.CreateUserDto;
 import com.halcyon.userservice.dto.UserPasswordResetEvent;
-import com.halcyon.userservice.exception.UnverifiedUserException;
 import com.halcyon.userservice.exception.UserNotFoundException;
 import com.halcyon.userservice.model.User;
 import com.halcyon.userservice.payload.ChangeEmailMessage;
+import com.halcyon.userservice.payload.UserIsBannedMessage;
 import com.halcyon.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.halcyon.userservice.util.UserUtil.isUserVerified;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final AuthProvider authProvider;
+    private final MailActionsProducer mailActionsProducer;
 
     public void create(CreateUserDto dto) {
         userRepository.save(
@@ -25,6 +28,16 @@ public class UserService {
                         .password(dto.getPassword())
                         .build()
         );
+    }
+
+    public User ban(User user) {
+        user.setBanned(true);
+        user = save(user);
+
+        UserIsBannedMessage message = new UserIsBannedMessage(user.getUsername(), user.getEmail());
+        mailActionsProducer.executeSendUserIsBannedMessage(message);
+
+        return user;
     }
 
     private User save(User user) {
@@ -63,7 +76,7 @@ public class UserService {
 
     public User updateUsername(String username) {
         User user = findByEmail(authProvider.getSubject());
-        isVerifiedUser(user);
+        isUserVerified(user, "You are not verified. Please confirm your email.");
 
         user.setUsername(username);
 
@@ -72,16 +85,10 @@ public class UserService {
 
     public User updateAbout(String about) {
         User user = findByEmail(authProvider.getSubject());
-        isVerifiedUser(user);
+        isUserVerified(user, "You are not verified. Please confirm your email.");
 
         user.setAbout(about);
 
         return save(user);
-    }
-
-    private void isVerifiedUser(User user) {
-        if (!user.isVerified()) {
-            throw new UnverifiedUserException("User is not verified. Please confirm your email.");
-        }
     }
 }

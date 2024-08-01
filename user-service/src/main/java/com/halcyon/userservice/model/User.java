@@ -36,6 +36,9 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "is_banned")
+    private boolean isBanned;
+
     @OneToMany(mappedBy = "owner")
     @JsonBackReference
     private List<Subscription> subscriptions;
@@ -43,5 +46,9 @@ public class User {
     @OneToMany(mappedBy = "target")
     @JsonBackReference
     private List<Subscription> subscribers;
+
+    @OneToMany(mappedBy = "target")
+    @JsonBackReference
+    private List<Strike> strikes;
 }
 

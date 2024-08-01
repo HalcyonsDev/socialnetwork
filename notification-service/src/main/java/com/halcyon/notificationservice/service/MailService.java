@@ -2,6 +2,7 @@ package com.halcyon.notificationservice.service;
 
 import com.halcyon.notificationservice.payload.ForgotPasswordMessage;
 import com.halcyon.notificationservice.payload.NewEmailVerificationMessage;
+import com.halcyon.notificationservice.payload.UserIsBannedMessage;
 import com.halcyon.notificationservice.payload.VerificationMessage;
 import com.halcyon.notificationservice.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,16 @@ public class MailService {
         mailMessage.setFrom(fromEmail);
         mailMessage.setTo(verificationMessage.getTo());
         mailMessage.setText(String.valueOf(verificationMessage.getVerificationCode()));
+
+        mailSender.send(mailMessage);
+    }
+
+    public void sendUserIsBannedMessage(UserIsBannedMessage userIsBannedMessage) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setSubject("You are banned.");
+        mailMessage.setFrom(fromEmail);
+        mailMessage.setTo(userIsBannedMessage.getBannedUserEmail());
+        mailMessage.setText(EmailUtil.getUserIsBanendMessage(userIsBannedMessage.getUsername()));
 
         mailSender.send(mailMessage);
     }

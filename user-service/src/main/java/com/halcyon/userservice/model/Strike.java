@@ -9,17 +9,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "subscriptions")
+@Table(name = "strikes")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Subscription {
+public class Strike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @JsonIgnore
     private Long id;
+
+    @Column(name = "cause")
+    private String cause;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
@@ -31,7 +34,8 @@ public class Subscription {
     @JsonManagedReference
     private User target;
 
-    public Subscription(User owner, User target) {
+    public Strike(String cause, User owner, User target) {
+        this.cause = cause;
         this.owner = owner;
         this.target = target;
     }

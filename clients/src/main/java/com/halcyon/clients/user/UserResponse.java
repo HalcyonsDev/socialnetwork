@@ -15,4 +15,5 @@ public class UserResponse {
     private String about;
     private String password;
     private boolean isVerified;
+    private boolean isBanned;
 }
