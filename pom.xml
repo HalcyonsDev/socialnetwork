@@ -30,6 +30,7 @@
         <module>redis-cache</module>
         <module>api-gateway</module>
         <module>clients</module>
+        <module>media-service</module>
     </modules>
     <scm>
         <connection/>

@@ -1,10 +1,5 @@
-package com.halcyon.userservice.filter;
+package com.halcyon.jwtlibrary;
 
-import com.halcyon.jwtlibrary.JwtAuthentication;
-import com.halcyon.jwtlibrary.JwtProvider;
-import com.halcyon.jwtlibrary.JwtUtil;
-import com.halcyon.jwtlibrary.TokenRevocationService;
-import com.halcyon.userservice.exception.TokenVerificationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

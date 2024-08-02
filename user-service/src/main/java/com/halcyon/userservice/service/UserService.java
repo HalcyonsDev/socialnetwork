@@ -1,5 +1,6 @@
 package com.halcyon.userservice.service;
 
+import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.userservice.dto.CreateUserDto;
 import com.halcyon.userservice.dto.UserPasswordResetEvent;
 import com.halcyon.userservice.exception.UserNotFoundException;

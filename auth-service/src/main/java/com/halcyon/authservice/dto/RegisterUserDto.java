@@ -19,11 +19,11 @@ public class RegisterUserDto {
     private String email;
 
     @Size(min = 1, max = 100, message = "Username must be more than 1 character and less than 100 characters.")
-    @Pattern(regexp = "[a-zA-Z0-9-]+", message = "Username must contain only letters, digits, and dashes")
+    @Pattern(regexp = "[a-zA-Z0-9 ]+", message = "Username must contain only letters, digits, and dashes")
     @NotBlank(message = "Username is required")
     private String username;
 
-    @Size(min = 1, max = 100, message = "\"About me\" must be more than 1 character and less than 500 characters.")
+    @Size(min = 1, max = 500, message = "\"About me\" must be more than 1 character and less than 500 characters.")
     private String about;
 
     @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters long")

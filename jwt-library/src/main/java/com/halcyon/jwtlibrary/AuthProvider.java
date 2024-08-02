@@ -1,6 +1,5 @@
-package com.halcyon.userservice.service;
+package com.halcyon.jwtlibrary;
 
-import com.halcyon.jwtlibrary.JwtAuthentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 

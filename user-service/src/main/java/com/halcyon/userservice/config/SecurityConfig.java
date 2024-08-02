@@ -1,6 +1,6 @@
 package com.halcyon.userservice.config;
 
-import com.halcyon.userservice.filter.JwtAuthFilter;
+import com.halcyon.jwtlibrary.JwtAuthFilter;
 import com.halcyon.userservice.security.RequestHeaderAuthenticationProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,8 @@ public class SecurityConfig {
                         auth -> auth
                                 // Entry points
                                 .requestMatchers(
-                                        "/api/v1/users/exists"
+                                        "/api/v1/users/exists",
+                                        "/api/v1/subscriptions/subscribers/email"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )

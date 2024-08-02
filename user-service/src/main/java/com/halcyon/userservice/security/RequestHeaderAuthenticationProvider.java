@@ -18,7 +18,6 @@ public class RequestHeaderAuthenticationProvider implements AuthenticationProvid
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        System.out.println("!!!!");
         String authSecretKey = String.valueOf(authentication.getPrincipal());
 
         if (StringUtils.isBlank(authSecretKey) || !authSecretKey.equals(privateSecret)) {

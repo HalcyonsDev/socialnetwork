@@ -5,14 +5,25 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: user-service
+        - id: user-controller
           uri: lb://user-service
           predicates:
             - Path=/api/v1/users/**
+
+        - id: subscription-controller
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/subscriptions/**
+
         - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/api/v1/auth/**
+
+        - id: media-service
+          uri: lb://media-service
+          predicates:
+            - Path=/api/v1/posts/**
 
 server:
   port: 9191

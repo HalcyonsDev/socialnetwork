@@ -1,17 +1,24 @@
-package com.halcyon.notificationservice;
+package com.halcyon.mediaservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableAsync;
 
-@SpringBootApplication
-@EnableAsync
-public class NotificationServiceApplication {
+@SpringBootApplication(
+        scanBasePackages = {
+                "com.halcyon.mediaservice",
+                "com.halcyon.jwtlibrary"
+        }
+)
+@EnableFeignClients(
+        basePackages = "com.halcyon.clients"
+)
+public class MediaServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(NotificationServiceApplication.class, args);
+        SpringApplication.run(MediaServiceApplication.class, args);
     }
 
     @Bean

@@ -1,5 +1,6 @@
 package com.halcyon.userservice.service;
 
+import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.userservice.dto.StrikeRequestDto;
 import com.halcyon.userservice.exception.StrikeAlreadyExistsException;
 import com.halcyon.userservice.model.Strike;

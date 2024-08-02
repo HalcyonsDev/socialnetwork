@@ -1,5 +1,6 @@
 package com.halcyon.userservice.service;
 
+import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.userservice.dto.SubscriptionDto;
 import com.halcyon.userservice.exception.SubscriptionAlreadyExistsException;
 import com.halcyon.userservice.exception.SubscriptionNotFoundException;
