@@ -11,7 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.halcyon.userservice.service.UserService;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.io.File;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -22,6 +25,24 @@ public class UserController {
     @GetMapping("/exists")
     public ResponseEntity<Boolean> existsByEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(userService.existsByEmail(email));
+    }
+
+    @PostMapping("/upload-avatar")
+    public ResponseEntity<User> uploadAvatar(@RequestParam("avatar")MultipartFile imageFile) {
+        User user = userService.uploadPhoto(imageFile);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/avatar/my")
+    public ResponseEntity<File> getAvatar() {
+        File avatar = userService.getAvatar();
+        return ResponseEntity.ok(avatar);
+    }
+
+    @GetMapping("/avatar")
+    public ResponseEntity<File> getAvatar(@RequestParam("email") String email) {
+        File avatar = userService.getAvatar(email);
+        return ResponseEntity.ok(avatar);
     }
 
     @PatchMapping(value = "/update-username", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -45,3 +45,7 @@ jwt:
 
 private:
   secret: some_secret_key
+
+file:
+  storage:
+    location: /var/www/socialnetwork/avatars

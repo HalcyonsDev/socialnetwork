@@ -14,6 +14,7 @@ public class UserResponse {
     private String username;
     private String about;
     private String password;
+    private String avatarPath;
     private boolean isVerified;
     private boolean isBanned;
 }

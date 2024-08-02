@@ -30,6 +30,9 @@ public class User {
     @Column(name = "about")
     private String about;
 
+    @Column(name = "avatar_path")
+    private String avatarPath;
+
     @Column(name = "is_verified")
     private boolean isVerified;
 

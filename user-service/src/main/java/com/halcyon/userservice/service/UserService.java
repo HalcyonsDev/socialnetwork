@@ -9,6 +9,9 @@ import com.halcyon.userservice.payload.UserIsBannedMessage;
 import com.halcyon.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 import static com.halcyon.userservice.util.UserUtil.isUserVerified;
 
@@ -18,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final AuthProvider authProvider;
     private final MailActionsProducer mailActionsProducer;
+    private final FileStorageService fileStorageService;
 
     public void create(CreateUserDto dto) {
         userRepository.save(
@@ -72,6 +76,25 @@ public class UserService {
         user.setEmail(changeEmailMessage.getNewEmail());
 
         save(user);
+    }
+
+    public User uploadPhoto(MultipartFile imageFile) {
+        User user = findByEmail(authProvider.getSubject());
+        isUserVerified(user, "You are not verified. Please confirm your email.");
+
+        String imagePath = fileStorageService.upload(imageFile);
+        user.setAvatarPath(imagePath);
+
+        return save(user);
+    }
+
+    public File getAvatar() {
+        User user = findByEmail(authProvider.getSubject());
+        return fileStorageService.getFileByPath(user.getAvatarPath());
+    }
+
+    public File getAvatar(String email) {
+        return fileStorageService.getFileByPath(findByEmail(email).getAvatarPath());
     }
 
     public User updateUsername(String username) {
