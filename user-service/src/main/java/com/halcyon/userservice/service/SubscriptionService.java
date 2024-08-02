@@ -55,12 +55,20 @@ public class SubscriptionService {
     }
 
     public List<Subscription> getSubscriptions() {
-        User owner = userService.findByEmail(authProvider.getSubject());
+        return getSubscriptionsByEmail(authProvider.getSubject());
+    }
+
+    public List<Subscription> getSubscriptionsByEmail(String email) {
+        User owner = userService.findByEmail(email);
         return subscriptionRepository.findAllByOwner(owner);
     }
 
     public List<Subscription> getSubscribers() {
-        User target = userService.findByEmail(authProvider.getSubject());
+        return getSubscribersByEmail(authProvider.getSubject());
+    }
+
+    public List<Subscription> getSubscribersByEmail(String email) {
+        User target = userService.findByEmail(email);
         return subscriptionRepository.findAllByTarget(target);
     }
 }

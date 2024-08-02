@@ -34,9 +34,21 @@ public class SubscriptionController {
         return ResponseEntity.ok(subscriptions);
     }
 
+    @GetMapping(value = "/email", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Subscription>> getSubscriptionsByEmail(@RequestParam("email") String email){
+        List<Subscription> subscriptions = subscriptionService.getSubscriptionsByEmail(email);
+        return ResponseEntity.ok(subscriptions);
+    }
+
     @GetMapping(value = "/subscribers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Subscription>> getSubscribers() {
         List<Subscription> subscribers = subscriptionService.getSubscribers();
+        return ResponseEntity.ok(subscribers);
+    }
+
+    @GetMapping(value = "/subscribers/email", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Subscription>> getSubscribersByEmail(@RequestParam("email") String email) {
+        List<Subscription> subscribers = subscriptionService.getSubscribersByEmail(email);
         return ResponseEntity.ok(subscribers);
     }
 }
