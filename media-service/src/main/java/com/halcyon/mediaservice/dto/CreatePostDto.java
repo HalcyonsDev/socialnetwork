@@ -16,7 +16,7 @@ public class CreatePostDto {
     @NotBlank(message = "Title is required")
     private String title;
 
-    @Size(min = 1, max = 5000, message = "\"About me\" must be more than 1 character and less than 5000 characters.")
+    @Size(min = 1, max = 5000, message = "Content must be more than 1 character and less than 5000 characters.")
     @NotBlank(message = "Content is required")
     private String content;
 }
