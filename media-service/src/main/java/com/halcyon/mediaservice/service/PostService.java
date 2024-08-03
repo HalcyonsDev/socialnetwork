@@ -7,9 +7,11 @@ import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.mediaservice.dto.CreatePostDto;
 import com.halcyon.mediaservice.dto.UpdatePostDto;
+import com.halcyon.mediaservice.exception.PostForbiddenException;
 import com.halcyon.mediaservice.exception.PostNotFoundException;
 import com.halcyon.mediaservice.model.Post;
 import com.halcyon.mediaservice.payload.NewPostMessage;
+import com.halcyon.mediaservice.repository.CommentRepository;
 import com.halcyon.mediaservice.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +29,7 @@ public class PostService {
     private String privateSecret;
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final AuthProvider authProvider;
     private final UserClient userClient;
     private final SubscribeClient subscribeClient;
@@ -45,6 +48,20 @@ public class PostService {
         mailActionsProducer.executeSendNewPostMessage(newPostMessage);
 
         return post;
+    }
+
+    public String delete(long postId) {
+        UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        Post post = findById(postId);
+
+        if (!userResponse.getEmail().equals(post.getOwnerEmail())) {
+            throw new PostForbiddenException();
+        }
+
+        postRepository.delete(post);
+        commentRepository.deleteAllByPost(post);
+
+        return "The post was successfully deleted.";
     }
 
     public Post findById(long postId) {
