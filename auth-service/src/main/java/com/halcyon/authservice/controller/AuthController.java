@@ -19,6 +19,8 @@ import com.halcyon.authservice.dto.ResetPasswordDto;
 import com.halcyon.authservice.security.RefreshTokenHeaderProvider;
 import com.halcyon.authservice.service.AuthService;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -37,9 +39,11 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(Objects.requireNonNullElse(response, "Please, complete two-factor authentication."));
+
     }
 
     @DeleteMapping("/logout")

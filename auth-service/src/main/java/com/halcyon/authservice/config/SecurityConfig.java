@@ -32,7 +32,8 @@ public class SecurityConfig {
                         auth -> auth
                                 // Entry points
                                 .requestMatchers(
-                                        "/api/v1/auth/**"
+                                        "/api/v1/auth/**",
+                                        "/api/v1/2fa/login"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )

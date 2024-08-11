@@ -17,4 +17,6 @@ public class UserResponse {
     private String avatarPath;
     private boolean isVerified;
     private boolean isBanned;
+    private boolean isUsing2FA;
+    private String secret;
 }

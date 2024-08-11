@@ -12,5 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(500) NOT NULL,
     avatar_path VARCHAR(500),
     is_verified BOOLEAN NOT NULL,
-    is_banned BOOLEAN NOT NULL
+    is_banned BOOLEAN NOT NULL,
+    is_using_2fa BOOLEAN NOT NULL,
+    secret VARCHAR(300)
 )

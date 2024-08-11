@@ -23,6 +23,16 @@ public class KafkaTopicConfig {
     }
 
     @Bean
+    public NewTopic saveSecretTopic() {
+        return TopicBuilder.name("saveSecret").partitions(3).build();
+    }
+
+    @Bean
+    public NewTopic use2FATopic() {
+        return TopicBuilder.name("use2FA").partitions(3).build();
+    }
+
+    @Bean
     public NewTopic sendVerificationMessageTopic() {
         return TopicBuilder.name("sendVerificationMessage").partitions(3).build();
     }

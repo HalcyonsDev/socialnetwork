@@ -6,6 +6,8 @@ import com.halcyon.userservice.dto.UserPasswordResetEvent;
 import com.halcyon.userservice.exception.UserNotFoundException;
 import com.halcyon.userservice.model.User;
 import com.halcyon.userservice.payload.ChangeEmailMessage;
+import com.halcyon.userservice.payload.SaveSecretMessage;
+import com.halcyon.userservice.payload.Use2FAMessage;
 import com.halcyon.userservice.payload.UserIsBannedMessage;
 import com.halcyon.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -114,5 +116,17 @@ public class UserService {
         user.setAbout(about);
 
         return save(user);
+    }
+
+    public void saveSecret(SaveSecretMessage saveSecretMessage) {
+        User user = findByEmail(saveSecretMessage.getEmail());
+        user.setSecret(saveSecretMessage.getSecret());
+        save(user);
+    }
+
+    public void use2FA(Use2FAMessage use2FAMessage) {
+        User user = findByEmail(use2FAMessage.getEmail());
+        user.setUsing2FA(true);
+        save(user);
     }
 }

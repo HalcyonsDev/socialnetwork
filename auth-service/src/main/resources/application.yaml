@@ -33,3 +33,6 @@ jwt:
 
 private:
   secret: some_secret_key
+
+2fa:
+  qr_prefix: https://api.qrserver.com/v1/create-qr-code/?data=

@@ -60,7 +60,12 @@ public class AuthService {
         UserResponse user = userClient.getByEmail(request.getEmail(), privateSecret);
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException();
+            throw new InvalidCredentialsException("Invalid credentials provided.");
+        }
+
+        if (user.isUsing2FA()) {
+            cacheManager.save("2fa:" + user.getEmail(), Duration.ofMinutes(5));
+            return null;
         }
 
         return getAuthResponse(request.getEmail());
@@ -106,7 +111,7 @@ public class AuthService {
         }
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException();
+            throw new InvalidCredentialsException("Invalid credentials provided.");
         }
 
         String newEncodedPassword = passwordEncoder.encode(dto.getNewPassword());

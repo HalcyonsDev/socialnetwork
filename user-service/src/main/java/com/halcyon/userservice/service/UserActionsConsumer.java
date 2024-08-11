@@ -1,12 +1,12 @@
 package com.halcyon.userservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halcyon.userservice.dto.CreateUserDto;
 import com.halcyon.userservice.dto.UserPasswordResetEvent;
 import com.halcyon.userservice.payload.ChangeEmailMessage;
-import liquibase.change.Change;
+import com.halcyon.userservice.payload.SaveSecretMessage;
+import com.halcyon.userservice.payload.Use2FAMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -56,5 +56,29 @@ public class UserActionsConsumer {
     @KafkaListener(topics = "verify", groupId = "users")
     public void listenVerifyByEmail(String email) {
         userService.verifyByEmail(email);
+    }
+
+    @KafkaListener(topics = "saveSecret", groupId = "users")
+    public void listenSaveSecret(String message) {
+        SaveSecretMessage saveSecretMessage;
+
+        try {
+            saveSecretMessage = objectMapper.readValue(message, SaveSecretMessage.class);
+            userService.saveSecret(saveSecretMessage);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @KafkaListener(topics = "use2FA", groupId = "users")
+    public void listenUse2FA(String message) {
+        Use2FAMessage use2FAMessage;
+
+        try {
+            use2FAMessage = objectMapper.readValue(message, Use2FAMessage.class);
+            userService.use2FA(use2FAMessage);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

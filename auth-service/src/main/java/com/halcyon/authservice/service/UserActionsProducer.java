@@ -3,7 +3,8 @@ package com.halcyon.authservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halcyon.authservice.payload.ChangeEmailMessage;
-import com.halcyon.authservice.payload.VerificationMessage;
+import com.halcyon.authservice.payload.SaveSecretMessage;
+import com.halcyon.authservice.payload.Use2FAMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -45,5 +46,23 @@ public class UserActionsProducer {
 
     public void executeConfirmByEmail(String email) {
         kafkaTemplate.send("verify", email);
+    }
+
+    public void executeSaveSecret(SaveSecretMessage saveSecretMessage) {
+        try {
+            String message = objectMapper.writeValueAsString(saveSecretMessage);
+            kafkaTemplate.send("saveSecret", message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void executeUse2FA(Use2FAMessage use2FAMessage) {
+        try {
+            String message = objectMapper.writeValueAsString(use2FAMessage);
+            kafkaTemplate.send("use2FA", message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

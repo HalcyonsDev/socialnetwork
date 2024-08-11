@@ -42,6 +42,12 @@ public class User {
     @Column(name = "is_banned")
     private boolean isBanned;
 
+    @Column(name = "is_using_2fa")
+    private boolean isUsing2FA;
+
+    @Column(name = "secret")
+    private String secret;
+
     @OneToMany(mappedBy = "owner")
     @JsonBackReference
     private List<Subscription> subscriptions;
