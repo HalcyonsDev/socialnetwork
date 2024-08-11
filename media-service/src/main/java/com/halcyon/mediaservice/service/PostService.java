@@ -7,10 +7,13 @@ import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.mediaservice.dto.CreatePostDto;
 import com.halcyon.mediaservice.dto.UpdatePostDto;
+import com.halcyon.mediaservice.exception.PostForbiddenException;
 import com.halcyon.mediaservice.exception.PostNotFoundException;
 import com.halcyon.mediaservice.model.Post;
 import com.halcyon.mediaservice.payload.NewPostMessage;
+import com.halcyon.mediaservice.repository.CommentRepository;
 import com.halcyon.mediaservice.repository.PostRepository;
+import com.halcyon.mediaservice.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,10 +30,16 @@ public class PostService {
     private String privateSecret;
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final RatingRepository ratingRepository;
     private final AuthProvider authProvider;
     private final UserClient userClient;
     private final SubscribeClient subscribeClient;
     private final MailActionsProducer mailActionsProducer;
+
+    public Post save(Post post) {
+        return postRepository.save(post);
+    }
 
     public Post create(CreatePostDto dto) {
         UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
@@ -38,13 +47,28 @@ public class PostService {
         isUserBanned(userResponse, "You are banned.");
         isUserVerified(userResponse, "You are not verified. Please confirm your email.");
 
-        Post post = postRepository.save(new Post(dto.getTitle(), dto.getContent(), userResponse.getEmail()));
+        Post post = save(new Post(dto.getTitle(), dto.getContent(), userResponse.getEmail()));
 
         List<SubscriptionResponse> subscribers = subscribeClient.getSubscriptions(userResponse.getEmail());
         NewPostMessage newPostMessage = new NewPostMessage(post.getId(), subscribers);
         mailActionsProducer.executeSendNewPostMessage(newPostMessage);
 
         return post;
+    }
+
+    public String delete(long postId) {
+        UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        Post post = findById(postId);
+
+        if (!userResponse.getEmail().equals(post.getOwnerEmail())) {
+            throw new PostForbiddenException();
+        }
+
+        postRepository.delete(post);
+        commentRepository.deleteAllByPost(post);
+        ratingRepository.deleteAllByPost(post);
+
+        return "The post was successfully deleted.";
     }
 
     public Post findById(long postId) {
@@ -56,7 +80,7 @@ public class PostService {
         Post post = findById(dto.getPostId());
 
         if (!post.getOwnerEmail().equals(authProvider.getSubject())) {
-            throw new PostNotFoundException();
+            throw new PostForbiddenException();
         }
 
         if (dto.getTitle() != null) {
@@ -67,6 +91,6 @@ public class PostService {
             post.setContent(dto.getContent());
         }
 
-        return postRepository.save(post);
+        return save(post);
     }
 }

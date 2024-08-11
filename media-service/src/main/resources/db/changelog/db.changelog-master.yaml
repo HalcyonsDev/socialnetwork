@@ -1,5 +1,7 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changeset/V1_0_0__create_posts_table.sql
+      file: db/changelog/changeset/V1_0_1__create_posts_table.sql
   - include:
       file: db/changelog/changeset/V1_0_0__create_comments_table.sql
+  - include:
+      file: db/changelog/changeset/V1_0_0__create_ratings_table.sql

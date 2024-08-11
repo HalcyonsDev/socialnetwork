@@ -1,5 +1,6 @@
 package com.halcyon.mediaservice.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,12 +11,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "ratings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -25,24 +26,20 @@ public class Post {
     @CreationTimestamp
     private Instant createdAt;
 
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "content")
-    private String content;
+    @Column(name = "is_like")
+    private boolean isLike;
 
     @Column(name = "owner_email")
     private String ownerEmail;
 
-    @Column(name = "likes_count")
-    private int likesCount;
+    @ManyToOne
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    @JsonManagedReference
+    private Post post;
 
-    @Column(name = "dislikes_count")
-    private int dislikesCount;
-
-    public Post(String title, String content, String ownerEmail) {
-        this.title = title;
-        this.content = content;
+    public Rating(boolean isLike, String ownerEmail, Post post) {
+        this.isLike = isLike;
         this.ownerEmail = ownerEmail;
+        this.post = post;
     }
 }
