@@ -106,6 +106,10 @@ public class AuthService {
     public String resetPassword(ResetPasswordDto dto, String token) {
         UserResponse user = userClient.getByEmail(jwtProvider.extractEmail(token), privateSecret);
 
+        if (user.isBanned()) {
+            throw new UserIsBannedException();
+        }
+
         if (!user.isVerified()) {
             throw new UserIsNotVerifiedException();
         }

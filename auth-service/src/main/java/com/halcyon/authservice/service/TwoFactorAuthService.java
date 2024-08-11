@@ -4,6 +4,8 @@ import com.halcyon.authservice.dto.Login2FADto;
 import com.halcyon.authservice.dto.Verify2FADto;
 import com.halcyon.authservice.exception.InvalidCredentialsException;
 import com.halcyon.authservice.exception.TwoFactorIsNotRequiredException;
+import com.halcyon.authservice.exception.UserIsBannedException;
+import com.halcyon.authservice.exception.UserIsNotVerifiedException;
 import com.halcyon.authservice.payload.AuthResponse;
 import com.halcyon.authservice.payload.SaveSecretMessage;
 import com.halcyon.authservice.payload.Setup2FAResponse;
@@ -42,13 +44,22 @@ public class TwoFactorAuthService {
     private final CacheManager cacheManager;
 
     public Setup2FAResponse setup() {
-        String email = authenticatedDataProvider.getEmail();
+        UserResponse user = userClient.getByEmail(authenticatedDataProvider.getEmail(), privateSecret);
+
+        if (user.isBanned()) {
+            throw new UserIsBannedException();
+        }
+
+        if (user.isVerified()) {
+            throw new UserIsNotVerifiedException();
+        }
+
         String secret = Base32.random();
 
-        SaveSecretMessage saveSecretMessage = new SaveSecretMessage(email, secret);
+        SaveSecretMessage saveSecretMessage = new SaveSecretMessage(user.getEmail(), secret);
         userActionsProducer.executeSaveSecret(saveSecretMessage);
 
-        return new Setup2FAResponse(generateQrCodeUrl(email, secret));
+        return new Setup2FAResponse(generateQrCodeUrl(user.getEmail(), secret));
     }
 
     public String verify2FA(Verify2FADto dto) {
