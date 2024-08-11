@@ -13,7 +13,6 @@ import com.halcyon.mediaservice.model.Post;
 import com.halcyon.mediaservice.payload.NewPostMessage;
 import com.halcyon.mediaservice.repository.CommentRepository;
 import com.halcyon.mediaservice.repository.PostRepository;
-import com.halcyon.mediaservice.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,6 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final RatingRepository ratingRepository;
     private final AuthProvider authProvider;
     private final UserClient userClient;
     private final SubscribeClient subscribeClient;
@@ -66,7 +64,6 @@ public class PostService {
 
         postRepository.delete(post);
         commentRepository.deleteAllByPost(post);
-        ratingRepository.deleteAllByPost(post);
 
         return "The post was successfully deleted.";
     }
