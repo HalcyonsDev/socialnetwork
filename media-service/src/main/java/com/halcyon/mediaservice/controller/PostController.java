@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
@@ -49,5 +51,17 @@ public class PostController {
 
         Post post = postService.update(dto);
         return ResponseEntity.ok(post);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<Post>> getMyPosts() {
+        List<Post> posts = postService.findMyPosts();
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Post>> getUserPosts(@RequestParam("email") String email) {
+        List<Post> posts = postService.findUserPosts(email);
+        return ResponseEntity.ok(posts);
     }
 }

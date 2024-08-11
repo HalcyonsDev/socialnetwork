@@ -13,6 +13,7 @@ import com.halcyon.mediaservice.model.Post;
 import com.halcyon.mediaservice.payload.NewPostMessage;
 import com.halcyon.mediaservice.repository.CommentRepository;
 import com.halcyon.mediaservice.repository.PostRepository;
+import com.halcyon.mediaservice.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final RatingRepository ratingRepository;
     private final AuthProvider authProvider;
     private final UserClient userClient;
     private final SubscribeClient subscribeClient;
@@ -49,7 +51,7 @@ public class PostService {
 
         List<SubscriptionResponse> subscribers = subscribeClient.getSubscriptions(userResponse.getEmail());
         NewPostMessage newPostMessage = new NewPostMessage(post.getId(), subscribers);
-        mailActionsProducer.executeSendNewPostMessage(newPostMessage);
+        mailActionsProducer .executeSendNewPostMessage(newPostMessage);
 
         return post;
     }
@@ -64,6 +66,7 @@ public class PostService {
 
         postRepository.delete(post);
         commentRepository.deleteAllByPost(post);
+        ratingRepository.deleteAllByPost(post);
 
         return "The post was successfully deleted.";
     }
@@ -89,5 +92,18 @@ public class PostService {
         }
 
         return save(post);
+    }
+
+    public List<Post> findMyPosts() {
+        return findUserPosts(authProvider.getSubject());
+    }
+
+    public List<Post> findUserPosts(String email) {
+        UserResponse userResponse = userClient.getByEmail(email, privateSecret);
+
+        isUserBanned(userResponse, "You are banned.");
+        isUserVerified(userResponse, "You are not verified. Please confirm your email.");
+
+        return postRepository.findAllByOwnerEmail(email);
     }
 }
