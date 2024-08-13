@@ -1,15 +1,14 @@
 package com.halcyon.clients.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserResponse {
+    private long id;
     private String email;
     private String username;
     private String about;
@@ -19,4 +18,5 @@ public class UserResponse {
     private boolean isBanned;
     private boolean isUsing2FA;
     private String secret;
+    private String authProvider;
 }

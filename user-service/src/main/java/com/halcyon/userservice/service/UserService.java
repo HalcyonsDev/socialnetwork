@@ -1,14 +1,14 @@
 package com.halcyon.userservice.service;
 
 import com.halcyon.jwtlibrary.AuthProvider;
+import com.halcyon.jwtlibrary.JwtProvider;
 import com.halcyon.userservice.dto.CreateUserDto;
+import com.halcyon.userservice.dto.RegisterOAuth2UserDto;
+import com.halcyon.userservice.dto.UpdateOAuth2UserDto;
 import com.halcyon.userservice.dto.UserPasswordResetEvent;
 import com.halcyon.userservice.exception.UserNotFoundException;
 import com.halcyon.userservice.model.User;
-import com.halcyon.userservice.payload.ChangeEmailMessage;
-import com.halcyon.userservice.payload.SaveSecretMessage;
-import com.halcyon.userservice.payload.Use2FAMessage;
-import com.halcyon.userservice.payload.UserIsBannedMessage;
+import com.halcyon.userservice.payload.*;
 import com.halcyon.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +25,7 @@ public class UserService {
     private final AuthProvider authProvider;
     private final MailActionsProducer mailActionsProducer;
     private final FileStorageService fileStorageService;
+    private final JwtProvider jwtProvider;
 
     public void create(CreateUserDto dto) {
         userRepository.save(
@@ -32,8 +33,21 @@ public class UserService {
                         .email(dto.getEmail())
                         .username(dto.getUsername())
                         .about(dto.getAbout())
+                        .authProvider("local")
                         .password(dto.getPassword())
                         .build()
+        );
+    }
+
+    public User registerOAuth2User(RegisterOAuth2UserDto dto) {
+        return userRepository.save(
+            User.builder()
+                    .email(dto.getEmail())
+                    .username(dto.getUsername())
+                    .avatarPath(dto.getAvatarUrl())
+                    .authProvider(dto.getAuthProvider())
+                    .isVerified(true)
+                    .build()
         );
     }
 
@@ -58,6 +72,16 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User with this email not found."));
+    }
+
+    public User findById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with this id not found."));
+    }
+
+    public User findByToken(String token) {
+        String email = jwtProvider.extractEmail(token);
+        return findByEmail(email);
     }
 
     public void resetPassword(UserPasswordResetEvent passwordResetEvent) {
@@ -114,6 +138,14 @@ public class UserService {
         isUserVerified(user, "You are not verified. Please confirm your email.");
 
         user.setAbout(about);
+
+        return save(user);
+    }
+
+    public User updateOAuth2User(UpdateOAuth2UserDto dto) {
+        User user = findByEmail(dto.getEmail());
+        user.setUsername(dto.getUsername());
+        user.setAvatarPath(dto.getAvatarUrl());
 
         return save(user);
     }

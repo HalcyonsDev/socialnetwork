@@ -42,6 +42,7 @@ public class SecurityConfig {
                                 // Entry points
                                 .requestMatchers(
                                         "/api/v1/users/exists",
+                                        "/api/v1/users",
                                         "/api/v1/subscriptions/subscribers/email"
                                 ).permitAll()
                                 .anyRequest().authenticated()

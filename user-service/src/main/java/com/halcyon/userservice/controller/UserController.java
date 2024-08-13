@@ -1,18 +1,14 @@
 package com.halcyon.userservice.controller;
 
 import com.halcyon.userservice.model.User;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.halcyon.userservice.service.UserService;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 
@@ -25,6 +21,18 @@ public class UserController {
     @GetMapping("/exists")
     public ResponseEntity<Boolean> existsByEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(userService.existsByEmail(email));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<User> getById(@PathVariable long userId) {
+        User user = userService.findById(userId);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping
+    public ResponseEntity<User> getByToken(@RequestParam("token") String token) {
+        User user = userService.findByToken(token);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/upload-avatar")

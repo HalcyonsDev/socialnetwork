@@ -2,14 +2,11 @@ package com.halcyon.authservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.halcyon.authservice.payload.ChangeEmailMessage;
-import com.halcyon.authservice.payload.SaveSecretMessage;
-import com.halcyon.authservice.payload.Use2FAMessage;
+import com.halcyon.authservice.payload.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import com.halcyon.authservice.dto.RegisterUserDto;
-import com.halcyon.authservice.payload.UserPasswordResetEvent;
 
 @Service
 @RequiredArgsConstructor

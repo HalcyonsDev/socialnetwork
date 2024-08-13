@@ -1,7 +1,6 @@
 package com.halcyon.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +17,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonIgnore
     private Long id;
 
     @Column(name = "email")
@@ -47,6 +45,9 @@ public class User {
 
     @Column(name = "secret")
     private String secret;
+
+    @Column(name = "auth_provider")
+    private String authProvider;
 
     @OneToMany(mappedBy = "owner")
     @JsonBackReference

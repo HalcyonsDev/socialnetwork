@@ -2,14 +2,17 @@ spring:
   application:
     name: media-service
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password: password
+  config:
+    import: optional:file:.env[.properties]
 
   kafka:
-    bootstrap-servers: localhost:29092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
   liquibase:
     enabled: true
@@ -21,9 +24,9 @@ spring:
     show-sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/media_service
-    username: postgres
-    password: password
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
 
 server:
   port: 8084
@@ -31,7 +34,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_CLIENT_DEFAULT_ZONE}
     fetch-registry: true
     register-with-eureka: true
     enabled: true
@@ -39,9 +42,9 @@ eureka:
 jwt:
   issuer: jwt-library
   access-token:
-    private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCVRXqcvIAztTtz0MIwbEozVuBszhxkBokV1LNEEYgOL2nuUwKkbmci0lO+mcII8xNb5ISvoHFPvWQif07XwA115TrAvrLyZIFYKToPCeHDPF31ylYsH4nCiXysS7/6Qx/ladB5Am3nJtRq5unsZo68St9ID31tQiQNeeWqdL2+udwJG50Wkg0MLc5sP2uCh0iMVbtaJ/5RiGQKzQFcZFM5Rozcb/D+WPOKSJbXCel0sUU53aU6KPNLM58Ad+Qf5OelnlVjAsD1TaEiBDxw/kueyN/7c0IYBNjs9fvQNiyequ1ZCQC9yFHpjinEKXIz2k7G+pPDuy1FWeEO0/IC1/51AgMBAAECggEANPYgUUEOSYpZTDe61nxtfTarTN96MkEhXVYIvrNrrwDCmHTqYJXtUO0IGn2qWwuHiFiVfUyzN2QOhbDes+znubc5t85RZnAjdji2aUSLzf36pm0CUwhjk9q9GdKMjEpJpFd9SJoEjXl47277e01OAl+cRhB844mOihuAUZC3C9aSEhUkcvgklAsHp4h4TKDgcyvx6zLe8bQfNY8FN+e57ZGmJgSdLdj3XI1o66HypaYeG8ZTP2Ufz8MCkZWpyVT8nqblbC5TUtBRHVx/JQmMWlFhZzjX+C26SOYZkRch5/M86d2fHMhVnuOIN0/vWF9sZTtMjrcIQRrGEvihhdUhdwKBgQDFtf6UNhFwXJA5ZnL7l/mG6FIlhmHBojQYxQkelbI/rE0q3XbdOE0ZByk6Aj/edoeYBBKpZaBlRqqdNBWnd/ktUs+tohohpsSP0Am0b8LT5chXgacJdl75ue0EbS+MhJWYzsEcaaceeBYa+QLdqFl87W/LiO/p+SsYvIJZRdFI0wKBgQDBR5FKNN4h30kqAOGmIbtUZGbhK23qreW1mde9Ebcl6rmsbKGBRQuraybVOdNTkRwv4kZpZ/EjTDcGsOr175+FJra4O+kNNrnGV9Wh9Djs+HVrVRKWNmg1KorbjXL1qAXJRgKWP/SKrNNMZjltSXQu7Ec8OfCUhOjD4zPQ2VuOlwKBgEjX3u4YZaByWijr2B1eRu8vlWSB+G5xJqSho9SC7uOKxfuvEOY8ohtAii33OjTqktatWXrUGJ53xNCaqgfDqijKw/2DJgGUAgPCcHDsZGnR1Vh4SmSwGhoEKJFi8QvipYNhWcDwJESTlgFmEWo9Zosip/fjghFAXmKEwbnGgW9FAoGASjQ40p2Tfruj8k1eVJL0wcS+PsqWq5fR7jO/QSZxA0yntkwKgX/JqCk+QnSt7pJymOutjsBKMvwK0DXSL1OtEci4M+lEYz9UeZK1QTVrOYd2RRvnQ+ZlgavwnbQjo667cfe//IFXWHpbsSQ5/fxKb81k1/mCpPKWDsbG2PLqFMcCgYEAuweuj3t6my3WnW6naYlgujX9LMYcjhgGJgpqRQjmHj0tYRhWflzYl6CX+cTYlUaVN5XVzydoqSnfqBRX81p4I9eqNdHCUURu0il4+S8Z5gjz3DAHArjofnD7xtYcCUzjHaKup5OFxIFY7wt5dTpKh8+BgdI7fnrjDt2Fr81zPNg=
-    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlUV6nLyAM7U7c9DCMGxKM1bgbM4cZAaJFdSzRBGIDi9p7lMCpG5nItJTvpnCCPMTW+SEr6BxT71kIn9O18ANdeU6wL6y8mSBWCk6Dwnhwzxd9cpWLB+Jwol8rEu/+kMf5WnQeQJt5ybUaubp7GaOvErfSA99bUIkDXnlqnS9vrncCRudFpINDC3ObD9rgodIjFW7Wif+UYhkCs0BXGRTOUaM3G/w/ljzikiW1wnpdLFFOd2lOijzSzOfAHfkH+TnpZ5VYwLA9U2hIgQ8cP5Lnsjf+3NCGATY7PX70DYsnqrtWQkAvchR6Y4pxClyM9pOxvqTw7stRVnhDtPyAtf+dQIDAQAB
-    validity: 30
+    private-key: ${PRIVATE_KEY}
+    public-key: ${PUBLIC_KEY}
+    validity: ${ACCESS_TOKEN_VALIDITY}
 
 private:
-  secret: some_secret_key
+  secret: ${PRIVATE_SECRET}

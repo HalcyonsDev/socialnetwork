@@ -4,11 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Setter
 @Getter
 @NoArgsConstructor
@@ -19,7 +17,7 @@ public class RegisterUserDto {
     private String email;
 
     @Size(min = 1, max = 100, message = "Username must be more than 1 character and less than 100 characters.")
-    @Pattern(regexp = "[a-zA-Z0-9 ]+", message = "Username must contain only letters, digits, and dashes")
+    @Pattern(regexp = "[a-zA-Z0-9 ]+", message = "Username must contain only letters, digits, and spaces.")
     @NotBlank(message = "Username is required")
     private String username;
 
