@@ -3,11 +3,11 @@ spring:
     name: auth-service
 
   kafka:
-    bootstrap-servers: ${LOCAL_KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${DOCKER_KAFKA_BOOTSTRAP_SERVERS}
 
   data:
     redis:
-      host: ${LOCAL_REDIS_HOST}
+      host: ${DOCKER_REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
@@ -53,19 +53,19 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: ${LOCAL_EUREKA_CLIENT_DEFAULT_ZONE}
+      defaultZone: ${DOCKER_EUREKA_CLIENT_DEFAULT_ZONE}
     fetch-registry: true
     register-with-eureka: true
     enabled: true
 
 jwt:
-    issuer: jwt-library
-    access-token:
-      private-key: ${PRIVATE_KEY}
-      public-key: ${PUBLIC_KEY}
-      validity: ${ACCESS_TOKEN_VALIDITY}
-    refresh-token:
-      validity:  ${REFRESH_TOKEN_VALIDITY}
+  issuer: jwt-library
+  access-token:
+    private-key: ${PRIVATE_KEY}
+    public-key: ${PUBLIC_KEY}
+    validity: ${ACCESS_TOKEN_VALIDITY}
+  refresh-token:
+    validity:  ${REFRESH_TOKEN_VALIDITY}
 
 private:
   secret: ${PRIVATE_SECRET}

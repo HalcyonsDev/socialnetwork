@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.halcyon.mediaservice.util.UserUtil.isUserBanned;
-import static com.halcyon.mediaservice.util.UserUtil.isUserVerified;
+import static com.halcyon.clients.util.UserUtil.isUserBanned;
+import static com.halcyon.clients.util.UserUtil.isUserVerified;
 
 @Service
 @RequiredArgsConstructor

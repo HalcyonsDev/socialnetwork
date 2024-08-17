@@ -2,15 +2,12 @@ spring:
   application:
     name: user-service
 
-  config:
-    import: optional:file:.env[.properties]
-
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${LOCAL_KAFKA_BOOTSTRAP_SERVERS}
 
   data:
     redis:
-      host: ${REDIS_HOST}
+      host: ${LOCAL_REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
@@ -24,7 +21,7 @@ spring:
     show-sql: true
 
   datasource:
-    url: ${POSTGRES_URL}
+    url: ${LOCAL_POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
 
@@ -34,7 +31,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_DEFAULT_ZONE}
+      defaultZone: ${LOCAL_EUREKA_CLIENT_DEFAULT_ZONE}
     fetch-registry: true
     register-with-eureka: true
     enabled: true

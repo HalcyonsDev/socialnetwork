@@ -1,18 +1,15 @@
 spring:
   application:
-    name: media-service
-
-  kafka:
-    bootstrap-servers: ${LOCAL_KAFKA_BOOTSTRAP_SERVERS}
-
-  data:
-    redis:
-      host: ${LOCAL_REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+    name: chat-service
 
   liquibase:
     enabled: true
+
+  data:
+    redis:
+      host: ${DOCKER_REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
   jpa:
     hibernate:
@@ -21,7 +18,7 @@ spring:
     show-sql: true
 
   datasource:
-    url: ${LOCAL_POSTGRES_URL}
+    url: ${DOCKER_POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
 
@@ -31,7 +28,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: ${LOCAL_EUREKA_CLIENT_DEFAULT_ZONE}
+      defaultZone: ${DOCKER_EUREKA_CLIENT_DEFAULT_ZONE}
     fetch-registry: true
     register-with-eureka: true
     enabled: true

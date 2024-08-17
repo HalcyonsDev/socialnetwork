@@ -18,8 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import static com.halcyon.mediaservice.util.UserUtil.isUserBanned;
-import static com.halcyon.mediaservice.util.UserUtil.isUserVerified;
+import static com.halcyon.clients.util.UserUtil.isUserBanned;
+import static com.halcyon.clients.util.UserUtil.isUserVerified;
 
 @Service
 @RequiredArgsConstructor

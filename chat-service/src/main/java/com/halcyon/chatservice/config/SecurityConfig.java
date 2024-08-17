@@ -1,4 +1,4 @@
-package com.halcyon.mediaservice.config;
+package com.halcyon.chatservice.config;
 
 import com.halcyon.jwtlibrary.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 // Entry points
+                                .requestMatchers(
+                                        "/api/v1/posts/{postId}"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
 

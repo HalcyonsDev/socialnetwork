@@ -1,18 +1,15 @@
 spring:
   application:
-    name: media-service
+    name: chat-service
 
-  kafka:
-    bootstrap-servers: ${LOCAL_KAFKA_BOOTSTRAP_SERVERS}
+  liquibase:
+    enabled: true
 
   data:
     redis:
       host: ${LOCAL_REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
-
-  liquibase:
-    enabled: true
 
   jpa:
     hibernate:
@@ -26,7 +23,7 @@ spring:
     password: ${POSTGRES_PASSWORD}
 
 server:
-  port: 8084
+  port: 8085
 
 eureka:
   client:

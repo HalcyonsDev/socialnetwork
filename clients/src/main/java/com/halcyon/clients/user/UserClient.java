@@ -11,6 +11,9 @@ public interface UserClient {
     @GetMapping("/api/v1/users/exists")
     boolean existsByEmail(@RequestParam("email") String email);
 
+    @GetMapping("/api/v1/users/{userId}")
+    UserResponse getById(@PathVariable long userId);
+
     @GetMapping("/api/v1/users/private")
     UserResponse getByEmail(@RequestParam("email") String email, @RequestHeader("PrivateSecret") String privateSecret);
 

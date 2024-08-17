@@ -1,11 +1,12 @@
-package com.halcyon.mediaservice.exception;
+package com.halcyon.clients.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class UserIsBannedException extends RuntimeException {
-    public UserIsBannedException(String message) {
+public class UnverifiedUserException extends RuntimeException {
+
+    public UnverifiedUserException(String message) {
         super(message);
     }
 }

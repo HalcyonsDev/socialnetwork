@@ -51,7 +51,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: ${LOCAL_EUREKA_CLIENT_DEFAULT_ZONE}
+      defaultZone: ${DOCKER_EUREKA_CLIENT_DEFAULT_ZONE}
     fetch-registry: true
     register-with-eureka: true
     enabled: true

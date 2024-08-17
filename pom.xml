@@ -31,6 +31,7 @@
         <module>api-gateway</module>
         <module>clients</module>
         <module>media-service</module>
+        <module>chat-service</module>
     </modules>
     <scm>
         <connection/>
@@ -70,5 +71,20 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:17.0.4.1_1-jre</image>
+                    </from>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -1,13 +1,13 @@
 spring:
   application:
-    name: media-service
+    name: user-service
 
   kafka:
-    bootstrap-servers: ${LOCAL_KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${DOCKER_KAFKA_BOOTSTRAP_SERVERS}
 
   data:
     redis:
-      host: ${LOCAL_REDIS_HOST}
+      host: ${DOCKER_REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
@@ -21,17 +21,17 @@ spring:
     show-sql: true
 
   datasource:
-    url: ${LOCAL_POSTGRES_URL}
+    url: ${DOCKER_POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
 
 server:
-  port: 8084
+  port: 8081
 
 eureka:
   client:
     service-url:
-      defaultZone: ${LOCAL_EUREKA_CLIENT_DEFAULT_ZONE}
+      defaultZone: ${DOCKER_EUREKA_CLIENT_DEFAULT_ZONE}
     fetch-registry: true
     register-with-eureka: true
     enabled: true
@@ -45,3 +45,7 @@ jwt:
 
 private:
   secret: ${PRIVATE_SECRET}
+
+file:
+  storage:
+    location: ${FILE_STORAGE_LOCATION}
