@@ -2,7 +2,6 @@ package com.halcyon.mediaservice.service;
 
 import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
-import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.mediaservice.dto.CreateCommentByParentDto;
 import com.halcyon.mediaservice.dto.CreateCommentDto;

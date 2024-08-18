@@ -4,7 +4,6 @@ import com.halcyon.authservice.security.oauth2.user.UserPrincipal;
 import com.halcyon.authservice.util.CookieUtil;
 import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
-import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.JwtProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

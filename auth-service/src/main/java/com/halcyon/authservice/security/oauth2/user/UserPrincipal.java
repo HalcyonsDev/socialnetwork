@@ -1,7 +1,6 @@
 package com.halcyon.authservice.security.oauth2.user;
 
 import com.halcyon.clients.user.PrivateUserResponse;
-import com.halcyon.clients.user.UserResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
