@@ -1,6 +1,7 @@
 package com.halcyon.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class User {
     private Long id;
 
     @Column(name = "email")
+    @JsonIgnore
     private String email;
 
     @Column(name = "username")

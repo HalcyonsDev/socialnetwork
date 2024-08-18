@@ -43,7 +43,7 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/api/v1/users/exists",
                                         "/api/v1/users/{userId}",
-                                        "/api/v1/subscriptions/subscribers/email"
+                                        "/api/v1/subscriptions/subscribers/owner/{ownerId}"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )

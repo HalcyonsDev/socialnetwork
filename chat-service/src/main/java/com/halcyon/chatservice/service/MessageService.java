@@ -8,6 +8,7 @@ import com.halcyon.chatservice.model.Message;
 import com.halcyon.chatservice.repository.MessageRepository;
 import com.halcyon.chatservice.support.MessageStatus;
 import com.halcyon.chatservice.support.Notification;
+import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
 import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.AuthProvider;
@@ -36,7 +37,7 @@ public class MessageService {
     private final SimpMessagingTemplate messagingTemplate;
 
     public Message create(CreateMessageDto dto) {
-        UserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
 
         if (sender.getId() == dto.getRecipientId()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't send a message to yourself.");
@@ -63,8 +64,8 @@ public class MessageService {
     }
 
     public Message updateContent(UpdateMessageDto dto) {
-        UserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isCorrectUser(user);
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
 
         Message message = findById(dto.getMessageId());
         if (message.getSenderId() == user.getId()) {
@@ -77,7 +78,9 @@ public class MessageService {
     }
 
     public Message findById(long messageId) {
-        UserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(MessageNotFoundException::new);
 
@@ -89,12 +92,16 @@ public class MessageService {
     }
 
     public long countNewMessages(long recipientId) {
-        UserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(sender, "You are banned.");
+
         return messageRepository.countBySenderIdAndRecipientIdAndStatus(recipientId, sender.getId(), MessageStatus.RECEIVED);
     }
 
     public Page<Message> findSentMeMessages(long recipientId, int offset, int limit) {
-        UserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(sender, "You are banned.");
+
         Page<Message> messages = messageRepository.findAllBySenderIdAndRecipientId(recipientId, sender.getId(),
                 PageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "createdAt")));
 
@@ -108,7 +115,9 @@ public class MessageService {
     }
 
     public Page<Message> findMyMessages(long recipientId, int offset, int limit) {
-        UserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse sender = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(sender, "You are banned.");
+
         return messageRepository.findAllBySenderIdAndRecipientId(sender.getId(), recipientId,
                 PageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
@@ -117,15 +126,11 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    private void areCorrectUsers(UserResponse owner, UserResponse recipient) {
-        isCorrectUser(owner);
+    private void areCorrectUsers(PrivateUserResponse owner, UserResponse recipient) {
+        isUserBanned(owner, "You are banned.");
+        isUserVerified(owner, "You are not verified. Please confirm your email.");
 
         isUserBanned(recipient, "Recipient is banned.");
         isUserVerified(recipient, "Recipient is not verified.");
-    }
-
-    private void isCorrectUser(UserResponse user) {
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
     }
 }

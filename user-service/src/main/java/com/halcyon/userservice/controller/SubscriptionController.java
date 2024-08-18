@@ -28,27 +28,33 @@ public class SubscriptionController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping(value = "/{subscriptionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Subscription> getById(@PathVariable long subscriptionId) {
+        Subscription subscription = subscriptionService.findById(subscriptionId);
+        return ResponseEntity.ok(subscription);
+    }
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Subscription>> getSubscriptions() {
         List<Subscription> subscriptions = subscriptionService.getSubscriptions();
         return ResponseEntity.ok(subscriptions);
     }
 
-    @GetMapping(value = "/email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Subscription>> getSubscriptionsByEmail(@RequestParam("email") String email){
-        List<Subscription> subscriptions = subscriptionService.getSubscriptionsByEmail(email);
+    @GetMapping(value = "/owner/{ownerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Subscription>> getSubscriptionsByOwnerId(@PathVariable long ownerId){
+        List<Subscription> subscriptions = subscriptionService.findSubscriptionsByOwnerId(ownerId);
         return ResponseEntity.ok(subscriptions);
     }
 
     @GetMapping(value = "/subscribers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Subscription>> getSubscribers() {
-        List<Subscription> subscribers = subscriptionService.getSubscribers();
+        List<Subscription> subscribers = subscriptionService.findSubscribers();
         return ResponseEntity.ok(subscribers);
     }
 
-    @GetMapping(value = "/subscribers/email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Subscription>> getSubscribersByEmail(@RequestParam("email") String email) {
-        List<Subscription> subscribers = subscriptionService.getSubscribersByEmail(email);
+    @GetMapping(value = "/subscribers/owner/{ownerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Subscription>> getSubscribersByEmail(@PathVariable long ownerId) {
+        List<Subscription> subscribers = subscriptionService.findSubscribersByOwnerId(ownerId);
         return ResponseEntity.ok(subscribers);
     }
 }

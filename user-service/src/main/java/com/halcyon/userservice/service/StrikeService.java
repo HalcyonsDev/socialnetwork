@@ -23,12 +23,11 @@ public class StrikeService {
 
     public Strike create(StrikeRequestDto dto) {
         User owner = userService.findByEmail(authProvider.getSubject());
-        User target = userService.findByEmail(dto.getTargetEmail());
-
-        isUserBanned(owner, "You are banned.");
-        isUserBanned(target, "This user is already banned.");
         isUserVerified(owner, "You are not verified. Please confirm your email.");
-        isUserVerified(target, "Target user is not verified.");
+        isUserBanned(owner, "You are banned.");
+
+        User target = userService.findByEmail(dto.getTargetEmail());
+        isUserBanned(target, "This user is already banned.");
 
         if (strikeRepository.existsByOwnerAndTarget(owner, target)) {
             throw new StrikeAlreadyExistsException();
@@ -44,7 +43,6 @@ public class StrikeService {
 
     public List<Strike> getSentStrikes() {
         User owner = userService.findByEmail(authProvider.getSubject());
-
         isUserBanned(owner, "You are banned.");
         isUserVerified(owner, "You are not verified. Please confirm your email.");
 
@@ -53,9 +51,7 @@ public class StrikeService {
 
     public List<Strike> getSentMeStrikes() {
         User target = userService.findByEmail(authProvider.getSubject());
-
         isUserBanned(target, "You are banned.");
-        isUserVerified(target, "You are not verified. Please confirm your email.");
 
         return strikeRepository.findAllByTarget(target);
     }

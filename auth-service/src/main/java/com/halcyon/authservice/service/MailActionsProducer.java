@@ -3,7 +3,6 @@ package com.halcyon.authservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halcyon.authservice.payload.ForgotPasswordMessage;
-import com.halcyon.authservice.payload.ForgotPasswordRequest;
 import com.halcyon.authservice.payload.NewEmailVerificationMessage;
 import com.halcyon.authservice.payload.VerificationMessage;
 import lombok.RequiredArgsConstructor;

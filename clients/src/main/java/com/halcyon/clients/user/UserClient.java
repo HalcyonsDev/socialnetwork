@@ -15,11 +15,14 @@ public interface UserClient {
     UserResponse getById(@PathVariable long userId);
 
     @GetMapping("/api/v1/users/private")
-    UserResponse getByEmail(@RequestParam("email") String email, @RequestHeader("PrivateSecret") String privateSecret);
+    PrivateUserResponse getByEmail(@RequestParam("email") String email, @RequestHeader("PrivateSecret") String privateSecret);
+
+    @GetMapping("/api/v1/users/private/{userId}")
+    PrivateUserResponse getPrivateById(@PathVariable long userId, @RequestHeader("PrivateSecret") String privateSecret);
 
     @PostMapping("/api/v1/users/private")
-    UserResponse registerOAuth2User(@RequestBody RegisterOAuth2UserDto dto, @RequestHeader("PrivateSecret") String privateSecret);
+    PrivateUserResponse registerOAuth2User(@RequestBody RegisterOAuth2UserDto dto, @RequestHeader("PrivateSecret") String privateSecret);
 
     @PostMapping("/api/v1/users/private/update-data")
-    UserResponse updateOAuth2UserData(@RequestBody UpdateOAuth2UserDto dto, @RequestHeader("PrivateSecret") String privateSecret);
+    PrivateUserResponse updateOAuth2UserData(@RequestBody UpdateOAuth2UserDto dto, @RequestHeader("PrivateSecret") String privateSecret);
 }

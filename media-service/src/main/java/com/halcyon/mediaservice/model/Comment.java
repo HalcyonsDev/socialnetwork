@@ -29,8 +29,8 @@ public class Comment {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "author_email")
-    private String authorEmail;
+    @Column(name = "author_id")
+    private long authorId;
 
     @ManyToOne
     @JoinColumn(name = "post_id", referencedColumnName = "id")

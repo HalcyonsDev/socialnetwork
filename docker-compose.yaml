@@ -141,7 +141,7 @@ services:
       - eureka-server
       - api-gateway
 
-  chat_service:
+  chat-service:
     image: halcyons/chat-service:latest
     container_name: chat-service
     env_file: "chat-service/.env"

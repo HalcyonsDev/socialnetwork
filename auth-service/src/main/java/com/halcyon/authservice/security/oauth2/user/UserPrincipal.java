@@ -1,5 +1,6 @@
 package com.halcyon.authservice.security.oauth2.user;
 
+import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserResponse;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,11 +27,11 @@ public class UserPrincipal implements OAuth2User {
         this.authorities = authorities;
     }
 
-    public static UserPrincipal create(UserResponse user) {
+    public static UserPrincipal create(PrivateUserResponse user) {
         return new UserPrincipal(user.getId(), user.getEmail(), user.getPassword(), Collections.emptyList());
     }
 
-    public static UserPrincipal create(UserResponse user, Map<String, Object> attributes) {
+    public static UserPrincipal create(PrivateUserResponse user, Map<String, Object> attributes) {
         UserPrincipal userPrincipal = create(user);
         userPrincipal.setAttributes(attributes);
 

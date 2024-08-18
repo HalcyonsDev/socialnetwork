@@ -33,3 +33,6 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     enabled: true
+
+private:
+  secret: ${PRIVATE_SECRET}

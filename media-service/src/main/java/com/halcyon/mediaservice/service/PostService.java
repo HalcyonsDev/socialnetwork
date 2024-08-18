@@ -2,8 +2,8 @@ package com.halcyon.mediaservice.service;
 
 import com.halcyon.clients.subscribe.SubscribeClient;
 import com.halcyon.clients.subscribe.SubscriptionResponse;
+import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
-import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.mediaservice.dto.CreatePostDto;
 import com.halcyon.mediaservice.dto.UpdatePostDto;
@@ -42,25 +42,27 @@ public class PostService {
     }
 
     public Post create(CreatePostDto dto) {
-        UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
 
-        isUserBanned(userResponse, "You are banned.");
-        isUserVerified(userResponse, "You are not verified. Please confirm your email.");
+        isUserBanned(user, "You are banned.");
+        isUserVerified(user, "You are not verified. Please confirm your email.");
 
-        Post post = save(new Post(dto.getTitle(), dto.getContent(), userResponse.getEmail()));
+        Post post = save(new Post(dto.getTitle(), dto.getContent(), user.getId()));
 
-        List<SubscriptionResponse> subscribers = subscribeClient.getSubscriptions(userResponse.getEmail());
+        List<SubscriptionResponse> subscribers = subscribeClient.getSubscriptions(user.getId());
         NewPostMessage newPostMessage = new NewPostMessage(post.getId(), subscribers);
-        mailActionsProducer .executeSendNewPostMessage(newPostMessage);
+        mailActionsProducer.executeSendNewPostMessage(newPostMessage);
 
         return post;
     }
 
     public String delete(long postId) {
-        UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         Post post = findById(postId);
 
-        if (!userResponse.getEmail().equals(post.getOwnerEmail())) {
+        if (post.getOwnerId() != user.getId()) {
             throw new PostForbiddenException();
         }
 
@@ -72,14 +74,20 @@ public class PostService {
     }
 
     public Post findById(long postId) {
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         return postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
     }
 
     public Post update(UpdatePostDto dto) {
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         Post post = findById(dto.getPostId());
 
-        if (!post.getOwnerEmail().equals(authProvider.getSubject())) {
+        if (post.getOwnerId() != user.getId()) {
             throw new PostForbiddenException();
         }
 
@@ -95,14 +103,16 @@ public class PostService {
     }
 
     public List<Post> findMyPosts() {
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         return findUserPosts(authProvider.getSubject());
     }
 
     public List<Post> findUserPosts(String email) {
-        UserResponse userResponse = userClient.getByEmail(email, privateSecret);
-
-        isUserBanned(userResponse, "You are banned.");
-        isUserVerified(userResponse, "You are not verified. Please confirm your email.");
+        PrivateUserResponse user = userClient.getByEmail(email, privateSecret);
+        isUserBanned(user, "You are banned.");
+        isUserVerified(user, "You are not verified. Please confirm your email.");
 
         return postRepository.findAllByOwnerEmail(email);
     }

@@ -1,6 +1,7 @@
 package com.halcyon.notificationservice.service;
 
 import com.halcyon.clients.subscribe.SubscriptionResponse;
+import com.halcyon.clients.user.UserClient;
 import com.halcyon.notificationservice.payload.*;
 import com.halcyon.notificationservice.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +17,13 @@ public class MailService {
     @Value("${spring.mail.username")
     private String fromEmail;
 
+    @Value("${private.secret}")
+    private String privateSecret;
+
     private static final String APP_HOST = "http://localhost:9191";
 
     private final JavaMailSender mailSender;
+    private final UserClient userClient;
 
     public void sendMailVerificationMessage(VerificationMessage verificationMessage) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -66,7 +71,7 @@ public class MailService {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setSubject("New Post.");
             mailMessage.setFrom(fromEmail);
-            mailMessage.setTo(subscriptionResponse.getOwner().getEmail());
+            mailMessage.setTo(userClient.getPrivateById(subscriptionResponse.getOwner().getId(), privateSecret).getEmail());
             mailMessage.setText(EmailUtil.getNewPostMessage(
                     subscriptionResponse.getTarget().getUsername(),
                     subscriptionResponse.getOwner().getUsername(),

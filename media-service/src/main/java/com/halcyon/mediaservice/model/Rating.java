@@ -29,17 +29,17 @@ public class Rating {
     @Column(name = "is_like")
     private boolean isLike;
 
-    @Column(name = "owner_email")
-    private String ownerEmail;
+    @Column(name = "owner_id")
+    private long ownerId;
 
     @ManyToOne
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     @JsonManagedReference
     private Post post;
 
-    public Rating(boolean isLike, String ownerEmail, Post post) {
+    public Rating(boolean isLike, long ownerId, Post post) {
         this.isLike = isLike;
-        this.ownerEmail = ownerEmail;
+        this.ownerId = ownerId;
         this.post = post;
     }
 }

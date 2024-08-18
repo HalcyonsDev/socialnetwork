@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
-    boolean existsByOwnerEmailAndPost(String ownerEmail, Post post);
+    boolean existsByOwnerIdAndPost(long ownerId, Post post);
     @Query("SELECT r FROM Rating r WHERE r.post = :post AND r.isLike = :isLike")
     Page<Rating> findAllByPostAndIsLike(@Param("post") Post post, @Param("isLike") boolean isLike, Pageable pageable);
     void deleteAllByPost(Post post);

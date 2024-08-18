@@ -31,8 +31,8 @@ public class Post {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "owner_email")
-    private String ownerEmail;
+    @Column(name = "owner_id")
+    private long ownerId;
 
     @Column(name = "likes_count")
     private int likesCount;
@@ -40,9 +40,9 @@ public class Post {
     @Column(name = "dislikes_count")
     private int dislikesCount;
 
-    public Post(String title, String content, String ownerEmail) {
+    public Post(String title, String content, long ownerId) {
         this.title = title;
         this.content = content;
-        this.ownerEmail = ownerEmail;
+        this.ownerId = ownerId;
     }
 }

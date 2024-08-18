@@ -1,7 +1,7 @@
 package com.halcyon.userservice.util;
 
 import com.halcyon.userservice.exception.UnverifiedUserException;
-import com.halcyon.userservice.exception.UserIsBannedException;
+import com.halcyon.userservice.exception.BannedUserException;
 import com.halcyon.userservice.model.User;
 
 public class UserUtil {
@@ -9,7 +9,7 @@ public class UserUtil {
     
     public static void isUserBanned(User user, String message) {
         if (user.isBanned()) {
-            throw new UserIsBannedException(message);
+            throw new BannedUserException(message);
         }
     }
 

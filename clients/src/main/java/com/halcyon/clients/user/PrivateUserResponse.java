@@ -1,15 +1,18 @@
 package com.halcyon.clients.user;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class UserResponse {
+public class PrivateUserResponse {
     private long id;
     private String username;
+    private String email;
     private String about;
     private String password;
     private String avatarPath;

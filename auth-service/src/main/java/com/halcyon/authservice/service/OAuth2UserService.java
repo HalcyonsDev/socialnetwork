@@ -4,10 +4,7 @@ import com.halcyon.authservice.exception.OAuth2AuthenticationProcessingException
 import com.halcyon.authservice.security.oauth2.user.OAuth2UserInfo;
 import com.halcyon.authservice.security.oauth2.user.OAuth2UserInfoFactory;
 import com.halcyon.authservice.security.oauth2.user.UserPrincipal;
-import com.halcyon.clients.user.RegisterOAuth2UserDto;
-import com.halcyon.clients.user.UpdateOAuth2UserDto;
-import com.halcyon.clients.user.UserClient;
-import com.halcyon.clients.user.UserResponse;
+import com.halcyon.clients.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -51,7 +48,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
-        UserResponse user;
+        PrivateUserResponse user;
         if (userClient.existsByEmail(oAuth2UserInfo.getEmail())) {
             user = userClient.getByEmail(oAuth2UserInfo.getEmail(), privateSecret);
 
@@ -69,7 +66,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         return UserPrincipal.create(user, oAuth2User.getAttributes());
     }
 
-    private UserResponse registerNewUser(OAuth2UserRequest userRequest, OAuth2UserInfo oAuth2UserInfo) {
+    private PrivateUserResponse registerNewUser(OAuth2UserRequest userRequest, OAuth2UserInfo oAuth2UserInfo) {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
         RegisterOAuth2UserDto dto = new RegisterOAuth2UserDto(
@@ -82,7 +79,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         return userClient.registerOAuth2User(dto, privateSecret);
     }
 
-    private UserResponse updateExistingUser(OAuth2UserInfo oAuth2UserInfo) {
+    private PrivateUserResponse updateExistingUser(OAuth2UserInfo oAuth2UserInfo) {
         UpdateOAuth2UserDto dto = new UpdateOAuth2UserDto(
                 oAuth2UserInfo.getEmail(),
                 oAuth2UserInfo.getUsername(),

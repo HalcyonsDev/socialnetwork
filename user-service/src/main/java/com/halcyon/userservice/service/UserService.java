@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
+import static com.halcyon.userservice.util.UserUtil.isUserBanned;
 import static com.halcyon.userservice.util.UserUtil.isUserVerified;
 
 @Service
@@ -107,6 +108,7 @@ public class UserService {
 
     public User uploadPhoto(MultipartFile imageFile) {
         User user = findByEmail(authProvider.getSubject());
+        isUserBanned(user, "You are banned.");
         isUserVerified(user, "You are not verified. Please confirm your email.");
 
         String imagePath = fileStorageService.upload(imageFile);
@@ -126,6 +128,7 @@ public class UserService {
 
     public User updateUsername(String username) {
         User user = findByEmail(authProvider.getSubject());
+        isUserBanned(user, "You are banned.");
         isUserVerified(user, "You are not verified. Please confirm your email.");
 
         user.setUsername(username);
@@ -135,6 +138,7 @@ public class UserService {
 
     public User updateAbout(String about) {
         User user = findByEmail(authProvider.getSubject());
+        isUserBanned(user, "You are banned.");
         isUserVerified(user, "You are not verified. Please confirm your email.");
 
         user.setAbout(about);

@@ -1,5 +1,6 @@
 package com.halcyon.mediaservice.service;
 
+import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
 import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.AuthProvider;
@@ -31,15 +32,15 @@ public class CommentService {
     private final PostService postService;
 
     public Comment create(CreateCommentDto dto) {
-        UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
 
-        isUserBanned(userResponse, "You are banned.");
-        isUserVerified(userResponse, "You are not verified. Please confirm your email.");
+        isUserBanned(user, "You are banned.");
+        isUserVerified(user, "You are not verified. Please confirm your email.");
 
         Post post = postService.findById(dto.getPostId());
         Comment comment = Comment.builder()
                 .content(dto.getContent())
-                .authorEmail(userResponse.getEmail())
+                .authorId(user.getId())
                 .post(post)
                 .build();
 
@@ -47,16 +48,16 @@ public class CommentService {
     }
 
     public Comment create(CreateCommentByParentDto dto) {
-        UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
 
-        isUserBanned(userResponse, "You are banned.");
-        isUserVerified(userResponse, "You are not verified. Please confirm your email.");
+        isUserBanned(user, "You are banned.");
+        isUserVerified(user, "You are not verified. Please confirm your email.");
 
         Comment parent = findById(dto.getParentId());
 
         Comment comment = Comment.builder()
                 .content(dto.getContent())
-                .authorEmail(userResponse.getEmail())
+                .authorId(user.getId())
                 .post(parent.getPost())
                 .parent(parent)
                 .build();
@@ -65,10 +66,12 @@ public class CommentService {
     }
 
     public String delete(long commentId) {
-        UserResponse userResponse = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         Comment comment = findById(commentId);
 
-        if (!comment.getAuthorEmail().equals(userResponse.getEmail())) {
+        if (comment.getAuthorId() != user.getId()) {
             throw new CommentForbiddenException();
         }
 
@@ -77,11 +80,17 @@ public class CommentService {
     }
 
     public Comment findById(long commentId) {
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         return commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
     }
 
     public List<Comment> findAllByPost(long postId) {
+        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, "You are banned.");
+
         Post post = postService.findById(postId);
         return commentRepository.findAllByPost(post);
     }

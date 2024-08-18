@@ -2,8 +2,8 @@ package com.halcyon.authservice.service;
 
 import com.halcyon.authservice.exception.*;
 import com.halcyon.authservice.payload.*;
+import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
-import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.JwtProvider;
 import com.halcyon.jwtlibrary.TokenRevocationService;
 import com.halcyon.rediscache.CacheManager;
@@ -22,6 +22,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Random;
+
+import static com.halcyon.clients.util.UserUtil.isUserBanned;
+import static com.halcyon.clients.util.UserUtil.isUserVerified;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +60,7 @@ public class AuthService {
     }
 
     public AuthResponse login(AuthRequest request) {
-        UserResponse user = userClient.getByEmail(request.getEmail(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(request.getEmail(), privateSecret);
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid credentials provided.");
@@ -94,7 +97,7 @@ public class AuthService {
     }
 
     public String forgotPassword(String email) {
-        UserResponse user = userClient.getByEmail(email, privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(email, privateSecret);
 
         String accessToken = jwtProvider.generateAccessToken(email);
         ForgotPasswordMessage forgotPasswordMessage = new ForgotPasswordMessage(user.getEmail(), accessToken);
@@ -104,15 +107,9 @@ public class AuthService {
     }
 
     public String resetPassword(ResetPasswordDto dto, String token) {
-        UserResponse user = userClient.getByEmail(jwtProvider.extractEmail(token), privateSecret);
-
-        if (user.isBanned()) {
-            throw new UserIsBannedException();
-        }
-
-        if (!user.isVerified()) {
-            throw new UserIsNotVerifiedException();
-        }
+        PrivateUserResponse user = userClient.getByEmail(jwtProvider.extractEmail(token), privateSecret);
+        isUserBanned(user, "You are banned.");
+        isUserVerified(user, "You are not verified. Please confirm your email.");
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid credentials provided.");

@@ -2,6 +2,7 @@ package com.halcyon.authservice.security.oauth2;
 
 import com.halcyon.authservice.security.oauth2.user.UserPrincipal;
 import com.halcyon.authservice.util.CookieUtil;
+import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
 import com.halcyon.clients.user.UserResponse;
 import com.halcyon.jwtlibrary.JwtProvider;
@@ -46,7 +47,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        UserResponse user = userClient.getByEmail(userPrincipal.getEmail(), privateSecret);
+        PrivateUserResponse user = userClient.getByEmail(userPrincipal.getEmail(), privateSecret);
 
         String accessToken = jwtProvider.generateAccessToken(user.getEmail());
 
