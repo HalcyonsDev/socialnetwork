@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class MessageController {
     private final MessageService messageService;
 
-    @PostMapping("/chat")
+    @MessageMapping("/chat")
     public ResponseEntity<Message> create(@RequestBody @Valid CreateMessageDto dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
