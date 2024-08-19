@@ -5,7 +5,7 @@ import com.halcyon.jwtlibrary.JwtProvider;
 import com.halcyon.userservice.dto.CreateUserDto;
 import com.halcyon.userservice.dto.RegisterOAuth2UserDto;
 import com.halcyon.userservice.dto.UpdateOAuth2UserDto;
-import com.halcyon.userservice.dto.UserPasswordResetEvent;
+import com.halcyon.userservice.dto.UserPasswordResetMessage;
 import com.halcyon.userservice.exception.UserNotFoundException;
 import com.halcyon.userservice.model.User;
 import com.halcyon.userservice.payload.*;
@@ -85,9 +85,9 @@ public class UserService {
         return findByEmail(email);
     }
 
-    public void resetPassword(UserPasswordResetEvent passwordResetEvent) {
-        User user = findByEmail(passwordResetEvent.getEmail());
-        user.setPassword(passwordResetEvent.getNewEncodedPassword());
+    public void resetPassword(UserPasswordResetMessage userPasswordResetMessage) {
+        User user = findByEmail(userPasswordResetMessage.getEmail());
+        user.setPassword(userPasswordResetMessage.getNewEncodedPassword());
 
         save(user);
     }

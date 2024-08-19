@@ -1,15 +1,13 @@
 package com.halcyon.authservice.payload;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPasswordResetEvent {
+@EqualsAndHashCode
+public class UserPasswordResetMessage {
     private String email;
     private String newEncodedPassword;
 }

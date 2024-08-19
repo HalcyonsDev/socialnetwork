@@ -23,9 +23,9 @@ public class UserActionsProducer {
         }
     }
 
-    public void executeResetPassword(UserPasswordResetEvent passwordResetEvent) {
+    public void executeResetPassword(UserPasswordResetMessage userPasswordResetMessage) {
         try {
-            String message = objectMapper.writeValueAsString(passwordResetEvent);
+            String message = objectMapper.writeValueAsString(userPasswordResetMessage);
             kafkaTemplate.send("resetPassword", message);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

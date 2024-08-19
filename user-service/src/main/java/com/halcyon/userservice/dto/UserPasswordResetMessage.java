@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPasswordResetEvent {
+public class UserPasswordResetMessage {
     private String email;
     private String newEncodedPassword;
 }

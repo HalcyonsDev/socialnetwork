@@ -10,14 +10,12 @@ import com.halcyon.rediscache.CacheManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.halcyon.authservice.dto.RegisterUserDto;
 import com.halcyon.authservice.dto.ResetPasswordDto;
 import com.halcyon.authservice.security.AuthenticatedDataProvider;
 import com.halcyon.authservice.security.RefreshTokenGenerator;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -116,9 +114,9 @@ public class AuthService {
         }
 
         String newEncodedPassword = passwordEncoder.encode(dto.getNewPassword());
-        UserPasswordResetEvent passwordResetEvent = new UserPasswordResetEvent(user.getEmail(), newEncodedPassword);
+        UserPasswordResetMessage userPasswordResetMessage = new UserPasswordResetMessage(user.getEmail(), newEncodedPassword);
 
-        userActionsProducer.executeResetPassword(passwordResetEvent);
+        userActionsProducer.executeResetPassword(userPasswordResetMessage);
         tokenRevocationService.revoke(jwtProvider.extractJti(getToken()));
 
         return "Password has been reset successfully.";
@@ -141,7 +139,7 @@ public class AuthService {
 
     public AuthResponse confirmEmailChange(ConfirmEmailChangeRequest request) {
         int correctVerificationCode = cacheManager.fetch(request.getNewEmail(), Integer.class)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email."));
+                .orElseThrow(InvalidEmailException::new);
 
         if (request.getVerificationCode() != correctVerificationCode) {
             throw new InvalidVerificationCodeException();

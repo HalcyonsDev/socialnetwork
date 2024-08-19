@@ -3,7 +3,7 @@ package com.halcyon.userservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halcyon.userservice.dto.CreateUserDto;
-import com.halcyon.userservice.dto.UserPasswordResetEvent;
+import com.halcyon.userservice.dto.UserPasswordResetMessage;
 import com.halcyon.userservice.payload.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -29,11 +29,11 @@ public class UserActionsConsumer {
 
     @KafkaListener(topics = "resetPassword", groupId = "users")
     public void listenResetPassword(String message) {
-        UserPasswordResetEvent passwordResetEvent;
+        UserPasswordResetMessage userPasswordResetMessage;
 
         try {
-            passwordResetEvent = objectMapper.readValue(message, UserPasswordResetEvent.class);
-            userService.resetPassword(passwordResetEvent);
+            userPasswordResetMessage = objectMapper.readValue(message, UserPasswordResetMessage.class);
+            userService.resetPassword(userPasswordResetMessage);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
