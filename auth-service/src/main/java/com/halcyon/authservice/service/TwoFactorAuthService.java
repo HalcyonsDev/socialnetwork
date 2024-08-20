@@ -59,11 +59,7 @@ public class TwoFactorAuthService {
 
     public String verify2FA(Verify2FADto dto) {
         PrivateUserResponse user = userClient.getByEmail(authenticatedDataProvider.getEmail(), privateSecret);
-        Totp totp = new Totp(user.getSecret());
-
-        if (!totp.verify(dto.getOtp())) {
-            throw new InvalidCredentialsException("Invalid verification code (otp)");
-        }
+        verifyOtp(user, dto.getOtp());
 
         Use2FAMessage use2FAMessage = new Use2FAMessage(user.getEmail());
         userActionsProducer.executeUse2FA(use2FAMessage);
@@ -78,11 +74,7 @@ public class TwoFactorAuthService {
             throw new TwoFactorIsNotRequiredException();
         }
 
-        Totp totp = new Totp(user.getSecret());
-
-        if (!totp.verify(dto.getOtp())) {
-            throw new InvalidCredentialsException("Invalid verification code (otp)");
-        }
+        verifyOtp(user, dto.getOtp());
 
         String accessToken = jwtProvider.generateAccessToken(user.getEmail());
         String refreshToken = refreshTokenGenerator.generate(user.getEmail());
@@ -94,5 +86,13 @@ public class TwoFactorAuthService {
 
     private String generateQrCodeUrl(String email, String secret) {
         return qr_prefix + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", ISSUER, email, secret, ISSUER), StandardCharsets.UTF_8) + "&size=200x200";
+    }
+
+    private void verifyOtp(PrivateUserResponse user, String otp) {
+        Totp totp = new Totp(user.getSecret());
+
+        if (!totp.verify(otp)) {
+            throw new InvalidCredentialsException("Invalid verification code (otp)");
+        }
     }
 }
