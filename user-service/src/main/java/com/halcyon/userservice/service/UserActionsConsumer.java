@@ -69,14 +69,7 @@ public class UserActionsConsumer {
     }
 
     @KafkaListener(topics = "use2FA", groupId = "users")
-    public void listenUse2FA(String message) {
-        Use2FAMessage use2FAMessage;
-
-        try {
-            use2FAMessage = objectMapper.readValue(message, Use2FAMessage.class);
-            userService.use2FA(use2FAMessage);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public void listenUse2FA(String email) {
+        userService.use2FA(email);
     }
 }

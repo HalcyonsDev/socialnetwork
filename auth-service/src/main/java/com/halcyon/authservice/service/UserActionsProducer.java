@@ -54,12 +54,7 @@ public class UserActionsProducer {
         }
     }
 
-    public void executeUse2FA(Use2FAMessage use2FAMessage) {
-        try {
-            String message = objectMapper.writeValueAsString(use2FAMessage);
-            kafkaTemplate.send("use2FA", message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public void executeUse2FA(String email) {
+        kafkaTemplate.send("use2FA", email);
     }
 }

@@ -160,8 +160,8 @@ public class UserService {
         save(user);
     }
 
-    public void use2FA(Use2FAMessage use2FAMessage) {
-        User user = findByEmail(use2FAMessage.getEmail());
+    public void use2FA(String email) {
+        User user = findByEmail(email);
         user.setUsing2FA(true);
         save(user);
     }

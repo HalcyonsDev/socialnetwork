@@ -193,13 +193,14 @@ public class AuthServiceTests {
 
     @Test
     void forgotPassword() {
+        when(authenticatedDataProvider.getEmail()).thenReturn(user.getEmail());
         when(userClient.getByEmail(user.getEmail(), privateSecret)).thenReturn(user);
         when(jwtProvider.generateAccessToken(user.getEmail())).thenReturn(TOKEN);
 
         ForgotPasswordMessage forgotPasswordMessage = new ForgotPasswordMessage(user.getEmail(), TOKEN);
         doNothing().when(mailActionsProducer).executeSendForgotPasswordMessage(forgotPasswordMessage);
 
-        assertThat(authService.forgotPassword(user.getEmail())).isEqualTo("A link to reset your password has been sent to your email");
+        assertThat(authService.forgotPassword()).isEqualTo("A link to reset your password has been sent to your email");
     }
 
     @Test

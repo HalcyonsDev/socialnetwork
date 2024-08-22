@@ -46,15 +46,21 @@ public class AuthService {
             throw new UserAlreadyExistsException();
         }
 
-        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        userActionsProducer.executeCreatingUser(dto);
+        sendCreatingUserMessage(dto);
         AuthResponse response = getAuthResponse(dto.getEmail());
-
-        VerificationMessage verificationMessage = new VerificationMessage(dto.getUsername(), dto.getEmail(), response.getAccessToken());
-        mailActionsProducer.executeSendVerificationMessage(verificationMessage);
+        sendVerificationMailMessage(dto.getUsername(), dto.getEmail(), response.getAccessToken());
 
         return response;
+    }
+
+    private void sendCreatingUserMessage(RegisterUserDto dto) {
+        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+        userActionsProducer.executeCreatingUser(dto);
+    }
+
+    private void sendVerificationMailMessage(String username, String email, String accessToken) {
+        VerificationMessage verificationMessage = new VerificationMessage(username, email, accessToken);
+        mailActionsProducer.executeSendVerificationMessage(verificationMessage);
     }
 
     public AuthResponse login(AuthRequest request) {
@@ -72,9 +78,21 @@ public class AuthService {
         return getAuthResponse(request.getEmail());
     }
 
+    private AuthResponse getAuthResponse(String email) {
+        String accessToken = jwtProvider.generateAccessToken(email);
+        String refreshToken = refreshTokenGenerator.generate(email);
+
+        return new AuthResponse(accessToken, refreshToken);
+    }
+
     public String logout() {
         tokenRevocationService.revoke(jwtProvider.extractJti(getToken()));
         return "You have successfully logout from your account.";
+    }
+
+    private String getToken() {
+        return Optional.ofNullable(httpServletRequest.getHeader("Authorization"))
+                .orElseThrow(IllegalStateException::new).substring(7);
     }
 
     public String confirmByEmail(String accessToken) {
@@ -94,32 +112,42 @@ public class AuthService {
         return new AuthResponse(accessToken, newRefreshToken);
     }
 
-    public String forgotPassword(String email) {
-        PrivateUserResponse user = userClient.getByEmail(email, privateSecret);
+    public String forgotPassword() {
+        PrivateUserResponse user = userClient.getByEmail(authenticatedDataProvider.getEmail(), privateSecret);
+        sendForgotPasswordMailMessage(user.getEmail());
 
-        String accessToken = jwtProvider.generateAccessToken(email);
-        ForgotPasswordMessage forgotPasswordMessage = new ForgotPasswordMessage(user.getEmail(), accessToken);
-
-        mailActionsProducer.executeSendForgotPasswordMessage(forgotPasswordMessage);
         return "A link to reset your password has been sent to your email";
+    }
+
+    private void sendForgotPasswordMailMessage(String email) {
+        String accessToken = jwtProvider.generateAccessToken(email);
+        ForgotPasswordMessage forgotPasswordMessage = new ForgotPasswordMessage(email, accessToken);
+        mailActionsProducer.executeSendForgotPasswordMessage(forgotPasswordMessage);
     }
 
     public String resetPassword(ResetPasswordDto dto, String token) {
         PrivateUserResponse user = userClient.getByEmail(jwtProvider.extractEmail(token), privateSecret);
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
+        isValidUser(user);
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid credentials provided.");
         }
 
-        String newEncodedPassword = passwordEncoder.encode(dto.getNewPassword());
-        UserPasswordResetMessage userPasswordResetMessage = new UserPasswordResetMessage(user.getEmail(), newEncodedPassword);
-
-        userActionsProducer.executeResetPassword(userPasswordResetMessage);
+        sendUserPasswordResetMessage(user.getEmail(), dto.getNewPassword());
         tokenRevocationService.revoke(jwtProvider.extractJti(getToken()));
 
         return "Password has been reset successfully.";
+    }
+
+    private void sendUserPasswordResetMessage(String email, String newPassword) {
+        String newEncodedPassword = passwordEncoder.encode(newPassword);
+        UserPasswordResetMessage userPasswordResetMessage = new UserPasswordResetMessage(email, newEncodedPassword);
+        userActionsProducer.executeResetPassword(userPasswordResetMessage);
+    }
+
+    private void isValidUser(PrivateUserResponse user) {
+        isUserBanned(user, "You are banned.");
+        isUserVerified(user, "You are not verified. Please confirm your email.");
     }
 
     public String changeEmail(String email) {
@@ -128,13 +156,20 @@ public class AuthService {
         }
 
         int verificationCode = generateVerificationCode();
-
-        NewEmailVerificationMessage verificationMessage = new NewEmailVerificationMessage(email, verificationCode);
-        mailActionsProducer.executeSendNewEmailVerificationMessage(verificationMessage);
+        sendEmailVerificationMailMessage(email, verificationCode);
 
         cacheManager.save(email, verificationCode, Duration.ofHours(1));
 
         return "The verification code will be sent to the email you specified.";
+    }
+
+    private int generateVerificationCode() {
+        return new Random().nextInt(9999 - 1000 + 1) + 1000;
+    }
+
+    private void sendEmailVerificationMailMessage(String email, int verificationCode) {
+        NewEmailVerificationMessage verificationMessage = new NewEmailVerificationMessage(email, verificationCode);
+        mailActionsProducer.executeSendNewEmailVerificationMessage(verificationMessage);
     }
 
     public AuthResponse confirmEmailChange(ConfirmEmailChangeRequest request) {
@@ -145,8 +180,7 @@ public class AuthService {
             throw new InvalidVerificationCodeException();
         }
 
-        ChangeEmailMessage changeEmailMessage = new ChangeEmailMessage(authenticatedDataProvider.getEmail(), request.getNewEmail());
-        userActionsProducer.executeChangeEmail(changeEmailMessage);
+        sendChangeEmailMessage(authenticatedDataProvider.getEmail(), request.getNewEmail());
 
         tokenRevocationService.revoke(jwtProvider.extractJti(getToken()));
         cacheManager.delete(request.getNewEmail());
@@ -154,19 +188,8 @@ public class AuthService {
         return getAuthResponse(request.getNewEmail());
     }
 
-    private AuthResponse getAuthResponse(String email) {
-        String accessToken = jwtProvider.generateAccessToken(email);
-        String refreshToken = refreshTokenGenerator.generate(email);
-
-        return new AuthResponse(accessToken, refreshToken);
-    }
-
-    private int generateVerificationCode() {
-        return new Random().nextInt(9999 - 1000 + 1) + 1000;
-    }
-
-    private String getToken() {
-        return Optional.ofNullable(httpServletRequest.getHeader("Authorization"))
-                .orElseThrow(IllegalStateException::new).substring(7);
+    private void sendChangeEmailMessage(String currentEmail, String newEmail) {
+        ChangeEmailMessage changeEmailMessage = new ChangeEmailMessage(currentEmail, newEmail);
+        userActionsProducer.executeChangeEmail(changeEmailMessage);
     }
 }

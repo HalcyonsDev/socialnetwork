@@ -1,7 +1,6 @@
 package com.halcyon.authservice.controller;
 
 import com.halcyon.authservice.payload.ConfirmEmailChangeRequest;
-import com.halcyon.authservice.payload.ForgotPasswordRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
@@ -74,9 +73,9 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/forgot-password", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        String response = authService.forgotPassword(request.getEmail());
+    @PostMapping(value = "/forgot-password")
+    public ResponseEntity<String> forgotPassword() {
+        String response = authService.forgotPassword();
         return ResponseEntity.ok(response);
     }
 

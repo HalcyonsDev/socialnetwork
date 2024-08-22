@@ -44,19 +44,12 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 oAuth2User.getAttributes()
         );
 
-        if (ObjectUtils.isEmpty(oAuth2UserInfo.getEmail())) {
-            throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
-        }
+        isValidEmail(oAuth2UserInfo.getEmail());
 
         PrivateUserResponse user;
         if (userClient.existsByEmail(oAuth2UserInfo.getEmail())) {
-            user = userClient.getByEmail(oAuth2UserInfo.getEmail(), privateSecret);
-
-            if (!user.getAuthProvider().equals(userRequest.getClientRegistration().getRegistrationId())) {
-                throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-                        user.getAuthProvider() + " account. Please use your " + user.getAuthProvider() +
-                        " account to login.");
-            }
+            String authProvider = userClient.getByEmail(oAuth2UserInfo.getEmail(), privateSecret).getAuthProvider();
+            isCorrectProvider(authProvider, userRequest);
 
             user = updateExistingUser(oAuth2UserInfo);
         } else {
@@ -64,6 +57,30 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         }
 
         return UserPrincipal.create(user, oAuth2User.getAttributes());
+    }
+
+    private void isValidEmail(String email) {
+        if (ObjectUtils.isEmpty(email)) {
+            throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
+        }
+    }
+
+    private void isCorrectProvider(String authProvider, OAuth2UserRequest userRequest) {
+        if (!userRequest.getClientRegistration().getRegistrationId().equals(authProvider)) {
+            throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
+                    authProvider + " account. Please use your " + authProvider +
+                    " account to login.");
+        }
+    }
+
+    private PrivateUserResponse updateExistingUser(OAuth2UserInfo oAuth2UserInfo) {
+        UpdateOAuth2UserDto dto = new UpdateOAuth2UserDto(
+                oAuth2UserInfo.getEmail(),
+                oAuth2UserInfo.getUsername(),
+                oAuth2UserInfo.getAvatarUrl()
+        );
+
+        return userClient.updateOAuth2UserData(dto, privateSecret);
     }
 
     private PrivateUserResponse registerNewUser(OAuth2UserRequest userRequest, OAuth2UserInfo oAuth2UserInfo) {
@@ -77,15 +94,5 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         );
 
         return userClient.registerOAuth2User(dto, privateSecret);
-    }
-
-    private PrivateUserResponse updateExistingUser(OAuth2UserInfo oAuth2UserInfo) {
-        UpdateOAuth2UserDto dto = new UpdateOAuth2UserDto(
-                oAuth2UserInfo.getEmail(),
-                oAuth2UserInfo.getUsername(),
-                oAuth2UserInfo.getAvatarUrl()
-        );
-
-        return userClient.updateOAuth2UserData(dto, privateSecret);
     }
 }

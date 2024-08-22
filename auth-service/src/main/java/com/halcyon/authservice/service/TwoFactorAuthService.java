@@ -7,7 +7,6 @@ import com.halcyon.authservice.exception.TwoFactorIsNotRequiredException;
 import com.halcyon.authservice.payload.AuthResponse;
 import com.halcyon.authservice.payload.SaveSecretMessage;
 import com.halcyon.authservice.payload.Setup2FAResponse;
-import com.halcyon.authservice.payload.Use2FAMessage;
 import com.halcyon.authservice.security.AuthenticatedDataProvider;
 import com.halcyon.authservice.security.RefreshTokenGenerator;
 import com.halcyon.clients.user.PrivateUserResponse;
@@ -46,25 +45,43 @@ public class TwoFactorAuthService {
 
     public Setup2FAResponse setup() {
         PrivateUserResponse user = userClient.getByEmail(authenticatedDataProvider.getEmail(), privateSecret);
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
+        isValidUser(user);
 
         String secret = Base32.random();
-
-        SaveSecretMessage saveSecretMessage = new SaveSecretMessage(user.getEmail(), secret);
-        userActionsProducer.executeSaveSecret(saveSecretMessage);
+        sendSaveSecretMessage(user.getEmail(), secret);
 
         return new Setup2FAResponse(generateQrCodeUrl(user.getEmail(), secret));
+    }
+
+    private void isValidUser(PrivateUserResponse user) {
+        isUserBanned(user, "You are banned.");
+        isUserVerified(user, "You are not verified. Please confirm your email.");
+    }
+
+    private void sendSaveSecretMessage(String email, String secret) {
+        SaveSecretMessage saveSecretMessage = new SaveSecretMessage(email, secret);
+        userActionsProducer.executeSaveSecret(saveSecretMessage);
+    }
+
+    private String generateQrCodeUrl(String email, String secret) {
+        return qr_prefix + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", ISSUER, email, secret, ISSUER), StandardCharsets.UTF_8) + "&size=200x200";
     }
 
     public String verify2FA(Verify2FADto dto) {
         PrivateUserResponse user = userClient.getByEmail(authenticatedDataProvider.getEmail(), privateSecret);
         verifyOtp(user, dto.getOtp());
 
-        Use2FAMessage use2FAMessage = new Use2FAMessage(user.getEmail());
-        userActionsProducer.executeUse2FA(use2FAMessage);
+        userActionsProducer.executeUse2FA(user.getEmail());
 
         return "Two-factor authentication is now enabled.";
+    }
+
+    private void verifyOtp(PrivateUserResponse user, String otp) {
+        Totp totp = new Totp(user.getSecret());
+
+        if (!totp.verify(otp)) {
+            throw new InvalidCredentialsException("Invalid verification code (otp)");
+        }
     }
 
     public AuthResponse login(Login2FADto dto) {
@@ -82,17 +99,5 @@ public class TwoFactorAuthService {
         cacheManager.delete("2fa:" + user.getEmail());
 
         return new AuthResponse(accessToken, refreshToken);
-    }
-
-    private String generateQrCodeUrl(String email, String secret) {
-        return qr_prefix + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", ISSUER, email, secret, ISSUER), StandardCharsets.UTF_8) + "&size=200x200";
-    }
-
-    private void verifyOtp(PrivateUserResponse user, String otp) {
-        Totp totp = new Totp(user.getSecret());
-
-        if (!totp.verify(otp)) {
-            throw new InvalidCredentialsException("Invalid verification code (otp)");
-        }
     }
 }
