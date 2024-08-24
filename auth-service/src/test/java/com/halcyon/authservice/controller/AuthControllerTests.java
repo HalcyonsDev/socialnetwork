@@ -203,7 +203,7 @@ class AuthControllerTests {
                 .content(getRequestJson(registerUserDto)))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content()
-                    .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("title").value("Bad Request"))
                 .andExpect(jsonPath("status").value(400))
                 .andExpect(jsonPath("detail").value(INVALID_USERNAME_MESSAGE));
@@ -243,7 +243,7 @@ class AuthControllerTests {
                 .content(getRequestJson(getAuthRequest())))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                    .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(content().string(COMPLETE_2FA_MESSAGE));
 
         user.setUsing2FA(false);
@@ -263,7 +263,7 @@ class AuthControllerTests {
                 .content(getRequestJson(getAuthRequest())))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content()
-                    .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("reason").value(INVALID_CREDENTIALS_MESSAGE));
     }
 
@@ -280,7 +280,7 @@ class AuthControllerTests {
                 .header(AUTH_HEADER, getBearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                    .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(content().string(SUCCESSFUL_LOGOUT_MESSAGE));
     }
 
@@ -298,7 +298,7 @@ class AuthControllerTests {
                 .header(REFRESH_TOKEN_HEADER, getJwtRefreshToken()))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("accessToken").isNotEmpty())
                 .andExpect(jsonPath("refreshToken").isEmpty())
                 .andExpect(jsonPath("type").value("Bearer"));
@@ -327,7 +327,7 @@ class AuthControllerTests {
                 .param("token", getJwtAccessToken()))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                    .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(content().string(ACCOUNT_IS_VERIFIED_MESSAGE));
     }
 
@@ -343,7 +343,7 @@ class AuthControllerTests {
                 .param("email", NEW_EMAIL))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                    .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(content().string(VERIFICATION_CODE_MESSAGE));
     }
 
@@ -406,7 +406,7 @@ class AuthControllerTests {
                 .content(getRequestJson(getConfirmEmailChangeRequest())))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("reason").value(INVALID_VERIFICATION_CODE_MESSAGE));
     }
 
@@ -418,7 +418,7 @@ class AuthControllerTests {
                 .header(AUTH_HEADER, getBearerToken()))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(content().string(FORGOT_PASSWORD_MESSAGE));
     }
 
@@ -437,7 +437,7 @@ class AuthControllerTests {
                 .content(getRequestJson(getResetPasswordDto())))
                 .andExpect(status().isOk())
                 .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
                 .andExpect(content().string(RESET_PASSWORD_MESSAGE));
     }
 
@@ -462,7 +462,7 @@ class AuthControllerTests {
                 .content(getRequestJson(resetPasswordDto)))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("title").value("Bad Request"))
                 .andExpect(jsonPath("status").value(400))
                 .andExpect(jsonPath("detail").value(INVALID_PASSWORD_MESSAGE));
@@ -478,7 +478,7 @@ class AuthControllerTests {
                 .content(getRequestJson(getResetPasswordDto())))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("reason").value(INVALID_CREDENTIALS_MESSAGE));
     }
 
@@ -497,7 +497,7 @@ class AuthControllerTests {
                 .content(getRequestJson(getResetPasswordDto())))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("reason").value(BANNED_USER_MESSAGE));
 
         user.setBanned(false);
