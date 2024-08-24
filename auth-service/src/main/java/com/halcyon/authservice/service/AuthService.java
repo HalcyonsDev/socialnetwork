@@ -86,7 +86,7 @@ public class AuthService {
     }
 
     public String logout() {
-        tokenRevocationService.revoke(jwtProvider.extractJti(getToken()));
+        tokenRevocationService.revoke(getToken());
         return "You have successfully logout from your account.";
     }
 
@@ -116,7 +116,7 @@ public class AuthService {
         PrivateUserResponse user = userClient.getByEmail(authenticatedDataProvider.getEmail(), privateSecret);
         sendForgotPasswordMailMessage(user.getEmail());
 
-        return "A link to reset your password has been sent to your email";
+        return "A link to reset your password has been sent to your email.";
     }
 
     private void sendForgotPasswordMailMessage(String email) {
@@ -134,7 +134,7 @@ public class AuthService {
         }
 
         sendUserPasswordResetMessage(user.getEmail(), dto.getNewPassword());
-        tokenRevocationService.revoke(jwtProvider.extractJti(getToken()));
+        tokenRevocationService.revoke(token);
 
         return "Password has been reset successfully.";
     }
@@ -182,7 +182,7 @@ public class AuthService {
 
         sendChangeEmailMessage(authenticatedDataProvider.getEmail(), request.getNewEmail());
 
-        tokenRevocationService.revoke(jwtProvider.extractJti(getToken()));
+        tokenRevocationService.revoke(getToken());
         cacheManager.delete(request.getNewEmail());
 
         return getAuthResponse(request.getNewEmail());

@@ -38,7 +38,7 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.eq;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTests {
+class AuthServiceTests {
     @Value("${private.secret}")
     private String privateSecret;
 

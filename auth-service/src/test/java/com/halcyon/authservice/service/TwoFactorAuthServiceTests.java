@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TwoFactorAuthServiceTests {
+class TwoFactorAuthServiceTests {
     @Value("${private.secret}")
     private String privateSecret;
 
