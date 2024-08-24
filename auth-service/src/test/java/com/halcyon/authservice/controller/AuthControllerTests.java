@@ -92,8 +92,6 @@ class AuthControllerTests {
         registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
     }
 
-    private static PrivateUserResponse user;
-
     private static final String INVALID_CREDENTIALS_MESSAGE = "Invalid credentials provided.";
     private static final String INVALID_USERNAME_MESSAGE = "Username must start with an alphabet and contain only letters, digits, and spaces.";
     private static final String COMPLETE_2FA_MESSAGE = "Please, complete two-factor authentication.";
@@ -111,6 +109,8 @@ class AuthControllerTests {
     public static final String REFRESH_TOKEN_HEADER = "X-Refresh-Token";
     private static final String NEW_EMAIL = "new_email@gmail.com";
     private static final String NEW_PASSWORD = "NewPassword123";
+
+    private static PrivateUserResponse user;
 
     @BeforeAll
     static void beforeAll() {
