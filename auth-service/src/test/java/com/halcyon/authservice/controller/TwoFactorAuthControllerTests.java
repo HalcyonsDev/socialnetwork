@@ -28,7 +28,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.Objects;
@@ -62,15 +61,11 @@ class TwoFactorAuthControllerTests {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.4");
-    private static final RedisContainer redis = new RedisContainer(DockerImageName.parse("redis:7.4.0-alpine"))
+    static final RedisContainer redis = new RedisContainer(DockerImageName.parse("redis:7.4.0-alpine"))
             .withExposedPorts(6379);
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.data.redis.host", redis::getHost);
         registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
     }
@@ -88,7 +83,6 @@ class TwoFactorAuthControllerTests {
 
     @BeforeAll
     static void beforeAll() {
-        postgres.start();
         redis.start();
 
         user = PrivateUserResponse.builder()
@@ -103,7 +97,6 @@ class TwoFactorAuthControllerTests {
 
     @AfterAll
     static void afterAll() {
-        postgres.stop();
         redis.stop();
     }
 
@@ -114,8 +107,6 @@ class TwoFactorAuthControllerTests {
 
     @Test
     void connectionEstablished() {
-        assertThat(postgres.isCreated()).isTrue();
-        assertThat(postgres.isRunning()).isTrue();
         assertThat(redis.isCreated()).isTrue();
         assertThat(redis.isRunning()).isTrue();
     }
