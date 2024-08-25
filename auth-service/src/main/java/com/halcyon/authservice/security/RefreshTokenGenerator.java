@@ -3,9 +3,8 @@ package com.halcyon.authservice.security;
 import com.halcyon.rediscache.CacheManager;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.halcyon.authservice.config.TokenConfigProperties;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -14,10 +13,11 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-@EnableConfigurationProperties(TokenConfigProperties.class)
 public class RefreshTokenGenerator {
+    @Value("${jwt.refresh-token.validity}")
+    private int refreshTokenValidity;
+
     private final CacheManager cacheManager;
-    private final TokenConfigProperties tokenConfigProperties;
 
     private static final String ALGORITHM = "SHA256";
 
@@ -44,7 +44,6 @@ public class RefreshTokenGenerator {
     }
 
     private void saveRefreshTokenInCache(String refreshToken, String email) {
-        int refreshTokenValidity = tokenConfigProperties.getRefreshToken().getValidity();
         cacheManager.save(refreshToken, email, Duration.ofMinutes(refreshTokenValidity));
     }
 }

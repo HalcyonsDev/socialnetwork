@@ -2,6 +2,7 @@ package com.halcyon.authservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.halcyon.authservice.exception.MessageSerializationException;
 import com.halcyon.authservice.payload.ForgotPasswordMessage;
 import com.halcyon.authservice.payload.NewEmailVerificationMessage;
 import com.halcyon.authservice.payload.VerificationMessage;
@@ -20,7 +21,7 @@ public class MailActionsProducer {
             String message = objectMapper.writeValueAsString(verificationMessage);
             kafkaTemplate.send("sendVerificationMessage", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize VerificationMessage to JSON", e);
         }
     }
 
@@ -29,7 +30,7 @@ public class MailActionsProducer {
             String message = objectMapper.writeValueAsString(forgotPasswordMessage);
             kafkaTemplate.send("sendForgotPasswordMessage", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize ForgotPasswordMessage to JSON", e);
         }
     }
 
@@ -38,7 +39,7 @@ public class MailActionsProducer {
             String message = objectMapper.writeValueAsString(verificationMessage);
             kafkaTemplate.send("sendNewEmailVerificationMessage", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize NewEmailVerificationMessage to JSON", e);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.halcyon.authservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.halcyon.authservice.exception.MessageSerializationException;
 import com.halcyon.authservice.payload.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -19,7 +20,7 @@ public class UserActionsProducer {
             String message = objectMapper.writeValueAsString(dto);
             kafkaTemplate.send("createUser", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize RegisterUserDto to JSON", e);
         }
     }
 
@@ -28,7 +29,7 @@ public class UserActionsProducer {
             String message = objectMapper.writeValueAsString(userPasswordResetMessage);
             kafkaTemplate.send("resetPassword", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize UserPasswordResetMessage to JSON", e);
         }
     }
 
@@ -37,7 +38,7 @@ public class UserActionsProducer {
             String message = objectMapper.writeValueAsString(changeEmailMessage);
             kafkaTemplate.send("changeEmail", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize ChangeEmailMessage to JSON", e);
         }
     }
 
@@ -50,7 +51,7 @@ public class UserActionsProducer {
             String message = objectMapper.writeValueAsString(saveSecretMessage);
             kafkaTemplate.send("saveSecret", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize SaveSecretMessage to JSON", e);
         }
     }
 

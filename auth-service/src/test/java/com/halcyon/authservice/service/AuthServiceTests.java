@@ -78,7 +78,6 @@ class AuthServiceTests {
     private static PrivateUserResponse user;
 
     private static final String TOKEN = "test_token";
-    private static final String JTI = "test_jti";
     private static final String AUTH_HEADER = "Authorization";
 
     @BeforeAll
@@ -109,6 +108,21 @@ class AuthServiceTests {
 
         AuthResponse response = authService.register(dto);
         isValidAuthResponse(response);
+    }
+
+    private RegisterUserDto getRegisterUserDto() {
+        return RegisterUserDto.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .about(user.getAbout())
+                .password(user.getPassword())
+                .build();
+    }
+
+    private void isValidAuthResponse(AuthResponse response) {
+        assertThat(response.getAccessToken()).isEqualTo(TOKEN);
+        assertThat(response.getRefreshToken()).isEqualTo(TOKEN);
+        assertThat(response.getTYPE()).isEqualTo("Bearer");
     }
 
     @Test
@@ -151,6 +165,11 @@ class AuthServiceTests {
     void logout() {
         mockRevokeMethod();
         assertThat(authService.logout()).isEqualTo("You have successfully logout from your account.");
+    }
+
+    private void mockRevokeMethod() {
+        when(httpServletRequest.getHeader(AUTH_HEADER)).thenReturn("Bearer " + TOKEN);
+        doNothing().when(tokenRevocationService).revoke(TOKEN);
     }
 
     @Test
@@ -200,7 +219,7 @@ class AuthServiceTests {
         ForgotPasswordMessage forgotPasswordMessage = new ForgotPasswordMessage(user.getEmail(), TOKEN);
         doNothing().when(mailActionsProducer).executeSendForgotPasswordMessage(forgotPasswordMessage);
 
-        assertThat(authService.forgotPassword()).isEqualTo("A link to reset your password has been sent to your email");
+        assertThat(authService.forgotPassword()).isEqualTo("A link to reset your password has been sent to your email.");
     }
 
     @Test
@@ -215,9 +234,13 @@ class AuthServiceTests {
         UserPasswordResetMessage userPasswordResetMessage = new UserPasswordResetMessage(user.getEmail(), "hashed_" + dto.getNewPassword());
         doNothing().when(userActionsProducer).executeResetPassword(userPasswordResetMessage);
 
-        mockRevokeMethod();
+        doNothing().when(tokenRevocationService).revoke(TOKEN);
 
         assertThat(authService.resetPassword(dto, TOKEN)).isEqualTo("Password has been reset successfully.");
+    }
+
+    private ResetPasswordDto getResetPasswordDto() {
+        return new ResetPasswordDto(user.getPassword(), "test_new_password");
     }
 
     @Test
@@ -227,8 +250,9 @@ class AuthServiceTests {
         user.setBanned(true);
         when(userClient.getByEmail(user.getEmail(), privateSecret)).thenReturn(user);
 
+        ResetPasswordDto resetPasswordDto = getResetPasswordDto();
         BannedUserException bannedUserException = assertThrows(BannedUserException.class,
-                () -> authService.resetPassword(getResetPasswordDto(), TOKEN));
+                () -> authService.resetPassword(resetPasswordDto, TOKEN));
         assertThat(bannedUserException.getMessage()).isEqualTo("You are banned.");
 
         user.setBanned(false);
@@ -241,8 +265,9 @@ class AuthServiceTests {
         user.setVerified(false);
         when(userClient.getByEmail(user.getEmail(), privateSecret)).thenReturn(user);
 
+        ResetPasswordDto resetPasswordDto = getResetPasswordDto();
         UnverifiedUserException unverifiedUserException = assertThrows(UnverifiedUserException.class,
-                () -> authService.resetPassword(getResetPasswordDto(), TOKEN));
+                () -> authService.resetPassword(resetPasswordDto, TOKEN));
         assertThat(unverifiedUserException.getMessage()).isEqualTo("You are not verified. Please confirm your email.");
 
         user.setVerified(true);
@@ -276,8 +301,9 @@ class AuthServiceTests {
     void changeEmail_userAlreadyExists() {
         when(userClient.existsByEmail(user.getEmail())).thenReturn(true);
 
+        String email = user.getEmail();
         UserAlreadyExistsException userAlreadyExistsException = assertThrows(UserAlreadyExistsException.class,
-                () -> authService.changeEmail(user.getEmail()));
+                () -> authService.changeEmail(email));
         assertThat(userAlreadyExistsException.getMessage()).isEqualTo("User with this email already exists.");
     }
 
@@ -301,6 +327,10 @@ class AuthServiceTests {
         isValidAuthResponse(response);
     }
 
+    private ConfirmEmailChangeRequest getConfirmEmailChangeRequest() {
+        return new ConfirmEmailChangeRequest(1111, "new_" + user.getEmail());
+    }
+
     @Test
     void confirmEmailChange_invalidEmail() {
         ConfirmEmailChangeRequest request = getConfirmEmailChangeRequest();
@@ -321,34 +351,5 @@ class AuthServiceTests {
         InvalidVerificationCodeException invalidVerificationCodeException = assertThrows(InvalidVerificationCodeException.class,
                 () -> authService.confirmEmailChange(request));
         assertThat(invalidVerificationCodeException.getMessage()).isEqualTo("Invalid verification code.");
-    }
-
-    private void isValidAuthResponse(AuthResponse response) {
-        assertThat(response.getAccessToken()).isEqualTo(TOKEN);
-        assertThat(response.getRefreshToken()).isEqualTo(TOKEN);
-        assertThat(response.getTYPE()).isEqualTo("Bearer");
-    }
-
-    private void mockRevokeMethod() {
-        when(httpServletRequest.getHeader(AUTH_HEADER)).thenReturn("Bearer " + TOKEN);
-        when(jwtProvider.extractJti(TOKEN)).thenReturn(JTI);
-        doNothing().when(tokenRevocationService).revoke(JTI);
-    }
-
-    private RegisterUserDto getRegisterUserDto() {
-        return RegisterUserDto.builder()
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .about(user.getAbout())
-                .password(user.getPassword())
-                .build();
-    }
-
-    private ResetPasswordDto getResetPasswordDto() {
-        return new ResetPasswordDto(user.getPassword(), "test_new_password");
-    }
-
-    private ConfirmEmailChangeRequest getConfirmEmailChangeRequest() {
-        return new ConfirmEmailChangeRequest(1111, "new_" + user.getEmail());
     }
 }

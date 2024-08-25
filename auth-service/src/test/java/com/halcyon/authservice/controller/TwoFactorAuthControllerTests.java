@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class TwoFactorAuthControllerTests {
+class TwoFactorAuthControllerTests {
     @Value("${private.secret}")
     private String privateSecret;
 

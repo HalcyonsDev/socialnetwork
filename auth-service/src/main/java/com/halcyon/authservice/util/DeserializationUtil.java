@@ -1,5 +1,6 @@
 package com.halcyon.authservice.util;
 
+import com.halcyon.authservice.exception.CookieDeserializationException;
 import jakarta.servlet.http.Cookie;
 
 import java.io.ByteArrayInputStream;
@@ -21,7 +22,7 @@ public class DeserializationUtil {
 
            return targetClass.cast(object);
        } catch (IOException | ClassNotFoundException e) {
-           throw new RuntimeException(e);
+           throw new CookieDeserializationException(e);
        }
     }
 }
