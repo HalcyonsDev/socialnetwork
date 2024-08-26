@@ -37,13 +37,13 @@ public class UserController {
 
     @PostMapping("/upload-avatar")
     public ResponseEntity<User> uploadAvatar(@RequestParam("avatar") MultipartFile imageFile) {
-        User user = userService.uploadPhoto(imageFile);
+        User user = userService.uploadAvatar(imageFile);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/avatar/my")
-    public ResponseEntity<File> getAvatar() {
-        File avatar = userService.getAvatar();
+    public ResponseEntity<File> getMyAvatar() {
+        File avatar = userService.getMyAvatar();
         return ResponseEntity.ok(avatar);
     }
 

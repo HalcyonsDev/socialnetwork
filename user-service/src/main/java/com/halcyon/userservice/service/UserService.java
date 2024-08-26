@@ -28,8 +28,11 @@ public class UserService {
     private final FileStorageService fileStorageService;
     private final JwtProvider jwtProvider;
 
+    private static final String BANNED_USER_MESSAGE = "You are banned.";
+    private static final String UNVERIFIED_USER_MESSAGE = "You are not verified. Please confirm your email.";
+
     public void create(CreateUserDto dto) {
-        userRepository.save(
+        save(
                 User.builder()
                         .email(dto.getEmail())
                         .username(dto.getUsername())
@@ -41,7 +44,7 @@ public class UserService {
     }
 
     public User registerOAuth2User(RegisterOAuth2UserDto dto) {
-        return userRepository.save(
+        return save(
             User.builder()
                     .email(dto.getEmail())
                     .username(dto.getUsername())
@@ -106,10 +109,10 @@ public class UserService {
         save(user);
     }
 
-    public User uploadPhoto(MultipartFile imageFile) {
+    public User uploadAvatar(MultipartFile imageFile) {
         User user = findByEmail(authProvider.getSubject());
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
+        isUserVerified(user, UNVERIFIED_USER_MESSAGE);
 
         String imagePath = fileStorageService.upload(imageFile);
         user.setAvatarPath(imagePath);
@@ -117,7 +120,7 @@ public class UserService {
         return save(user);
     }
 
-    public File getAvatar() {
+    public File getMyAvatar() {
         User user = findByEmail(authProvider.getSubject());
         return fileStorageService.getFileByPath(user.getAvatarPath());
     }
@@ -128,8 +131,8 @@ public class UserService {
 
     public User updateUsername(String username) {
         User user = findByEmail(authProvider.getSubject());
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
+        isUserVerified(user, UNVERIFIED_USER_MESSAGE);
 
         user.setUsername(username);
 
@@ -138,8 +141,8 @@ public class UserService {
 
     public User updateAbout(String about) {
         User user = findByEmail(authProvider.getSubject());
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
+        isUserVerified(user, UNVERIFIED_USER_MESSAGE);
 
         user.setAbout(about);
 

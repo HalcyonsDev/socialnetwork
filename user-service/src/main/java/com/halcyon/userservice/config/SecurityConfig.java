@@ -41,6 +41,7 @@ public class SecurityConfig {
                         auth -> auth
                                 // Entry points
                                 .requestMatchers(
+                                        "/api/v1/users",
                                         "/api/v1/users/exists",
                                         "/api/v1/users/{userId}",
                                         "/api/v1/subscriptions/subscribers/owner/{ownerId}"

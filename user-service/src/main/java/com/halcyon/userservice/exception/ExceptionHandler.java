@@ -18,6 +18,9 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
             status = HttpStatus.BAD_REQUEST;
         }
 
-        return ResponseEntity.status(status).body(new ExceptionResponse(ex.getMessage()));
+        return ResponseEntity
+                .status(status)
+                .header("Content-Type", "application/problem+json")
+                .body(new ExceptionResponse(ex.getMessage()));
     }
 }
