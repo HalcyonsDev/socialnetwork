@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halcyon.userservice.dto.CreateUserDto;
 import com.halcyon.userservice.dto.UserPasswordResetMessage;
+import com.halcyon.userservice.exception.MessageDeserializationException;
 import com.halcyon.userservice.payload.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,14 +17,14 @@ public class UserActionsConsumer {
     private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "createUser", groupId = "users")
-    public void listenCreatingNews(String message) {
+    public void listenCreatingUser(String message) {
         CreateUserDto dto;
 
         try {
             dto = objectMapper.readValue(message, CreateUserDto.class);
             userService.create(dto);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageDeserializationException("Failed to deserialize CreateUserDto to JSON", e);
         }
     }
 
@@ -35,7 +36,7 @@ public class UserActionsConsumer {
             userPasswordResetMessage = objectMapper.readValue(message, UserPasswordResetMessage.class);
             userService.resetPassword(userPasswordResetMessage);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageDeserializationException("Failed to deserialize UserPasswordResetMessage to JSON", e);
         }
     }
 
@@ -47,7 +48,7 @@ public class UserActionsConsumer {
             changeEmailMessage = objectMapper.readValue(message, ChangeEmailMessage.class);
             userService.changeEmail(changeEmailMessage);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageDeserializationException("Failed to deserialize ChangeEmailMessage to JSON", e);
         }
     }
 
@@ -64,7 +65,7 @@ public class UserActionsConsumer {
             saveSecretMessage = objectMapper.readValue(message, SaveSecretMessage.class);
             userService.saveSecret(saveSecretMessage);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageDeserializationException("Failed to deserialize SaveSecretMessage to JSON", e);
         }
     }
 

@@ -17,26 +17,38 @@ public class PrivateUserController {
     private final UserService userService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PrivateUserResponse> getByEmail(@RequestParam("email") String email) {
-        User foundUser = userService.findByEmail(email);
+    public ResponseEntity<PrivateUserResponse> getByEmail(
+            @RequestParam("email") String email,
+            @RequestHeader("PrivateSecret") String privateSecret
+    ) {
+        User foundUser = userService.getByEmail(email, privateSecret);
         return ResponseEntity.ok(new PrivateUserResponse(foundUser));
     }
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PrivateUserResponse> getById(@PathVariable long userId) {
-        User foundUser = userService.findById(userId);
+    public ResponseEntity<PrivateUserResponse> getById(
+            @PathVariable long userId,
+            @RequestHeader("PrivateSecret") String privateSecret
+    ) {
+        User foundUser = userService.getById(userId, privateSecret);
         return ResponseEntity.ok(new PrivateUserResponse(foundUser));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PrivateUserResponse> registerOAuth2User(@RequestBody RegisterOAuth2UserDto dto) {
-        User user = userService.registerOAuth2User(dto);
+    public ResponseEntity<PrivateUserResponse> registerOAuth2User(
+            @RequestBody RegisterOAuth2UserDto dto,
+            @RequestHeader("PrivateSecret") String privateSecret
+    ) {
+        User user = userService.createOAuth2User(dto, privateSecret);
         return ResponseEntity.ok(new PrivateUserResponse(user));
     }
 
     @PostMapping(value = "/update-data", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PrivateUserResponse> updateOAuth2UserData(@RequestBody UpdateOAuth2UserDto dto) {
-        User user = userService.updateOAuth2User(dto);
+    public ResponseEntity<PrivateUserResponse> updateOAuth2UserData(
+            @RequestBody UpdateOAuth2UserDto dto,
+            @RequestHeader("PrivateSecret") String privateSecret
+    ) {
+        User user = userService.updateOAuth2User(dto, privateSecret);
         return ResponseEntity.ok(new PrivateUserResponse(user));
     }
 }

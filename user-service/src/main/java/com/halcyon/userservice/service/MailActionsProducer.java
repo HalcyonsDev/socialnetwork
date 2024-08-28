@@ -2,6 +2,7 @@ package com.halcyon.userservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.halcyon.userservice.exception.MessageSerializationException;
 import com.halcyon.userservice.payload.UserIsBannedMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -18,7 +19,7 @@ public class MailActionsProducer {
             String message = objectMapper.writeValueAsString(userIsBannedMessage);
             kafkaTemplate.send("sendUserIsBannedMessage", message);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new MessageSerializationException("Failed to serialize UserIsBannedMessage to JSON", e);
         }
     }
 }

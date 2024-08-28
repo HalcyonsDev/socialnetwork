@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
@@ -43,6 +44,9 @@ class UserServiceTests {
 
     private static final String BANNED_USER_MESSAGE = "You are banned.";
     private static final String UNVERIFIED_USER_MESSAGE = "You are not verified. Please confirm your email.";
+    private static final String BAD_CREDENTIALS_MESSAGE = "Bad Request Header Credentials.";
+
+    private static final String INVALID_SECRET = "invalid_secret";
 
     private static User user;
 
@@ -58,17 +62,11 @@ class UserServiceTests {
     }
 
     @Test
-    void registerOAuth2User() {
+    void registerOAuth2User_badRequestCredentials() {
         RegisterOAuth2UserDto registerOAuth2UserDto = getRegisterOAuth2UserDto();
-
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        User returnedUser = userService.registerOAuth2User(registerOAuth2UserDto);
-
-        assertThat(returnedUser.getEmail()).isEqualTo(user.getEmail());
-        assertThat(returnedUser.getUsername()).isEqualTo(user.getUsername());
-        assertThat(returnedUser.getAvatarPath()).isEqualTo(user.getAvatarPath());
-        assertThat(returnedUser.getAuthProvider()).isEqualTo(user.getAuthProvider());
+        BadCredentialsException badCredentialsException = assertThrows(BadCredentialsException.class,
+                () -> userService.createOAuth2User(registerOAuth2UserDto, INVALID_SECRET));
+        assertThat(badCredentialsException.getMessage()).isEqualTo(BAD_CREDENTIALS_MESSAGE);
     }
 
     private RegisterOAuth2UserDto getRegisterOAuth2UserDto() {
@@ -198,18 +196,11 @@ class UserServiceTests {
     }
 
     @Test
-    void updateOAuth2User() {
+    void updateOAuth2User_badRequestCredentials() {
         UpdateOAuth2UserDto updateOAuth2UserDto = getUpdateOAuth2UserDto();
-
-        when(userRepository.findByEmail(updateOAuth2UserDto.getEmail())).thenReturn(Optional.of(user));
-        when(userRepository.save(user)).thenReturn(user);
-
-        User returnedUser = userService.updateOAuth2User(updateOAuth2UserDto);
-        assertThat(returnedUser.getUsername()).isEqualTo(updateOAuth2UserDto.getUsername());
-        assertThat(returnedUser.getAvatarPath()).isEqualTo(updateOAuth2UserDto.getAvatarUrl());
-
-        verify(userRepository).findByEmail(updateOAuth2UserDto.getEmail());
-        verify(userRepository).save(user);
+        BadCredentialsException badCredentialsException = assertThrows(BadCredentialsException.class,
+                () -> userService.updateOAuth2User(updateOAuth2UserDto, INVALID_SECRET));
+        assertThat(badCredentialsException.getMessage()).isEqualTo(BAD_CREDENTIALS_MESSAGE);
     }
 
     private UpdateOAuth2UserDto getUpdateOAuth2UserDto() {
