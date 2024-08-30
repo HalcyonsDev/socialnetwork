@@ -1,6 +1,6 @@
 package com.halcyon.userservice.controller;
 
-import com.halcyon.userservice.dto.StrikeRequestDto;
+import com.halcyon.userservice.dto.CreateStrikeDto;
 import com.halcyon.userservice.model.Strike;
 import com.halcyon.userservice.service.StrikeService;
 import jakarta.validation.Valid;
@@ -20,8 +20,8 @@ import java.util.List;
 public class StrikeController {
     private final StrikeService strikeService;
 
-    @PostMapping(value = "/strike", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Strike> create(@RequestBody @Valid StrikeRequestDto dto, BindingResult bindingResult) {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Strike> create(@RequestBody @Valid CreateStrikeDto dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
         }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import static com.halcyon.userservice.util.UserUtil.isUserBanned;
 import static com.halcyon.userservice.util.UserUtil.isUserVerified;
@@ -56,6 +57,9 @@ public class UserService {
                         .about(dto.getAbout())
                         .authProvider("local")
                         .password(dto.getPassword())
+                        .strikes(new ArrayList<>())
+                        .subscribers(new ArrayList<>())
+                        .subscriptions(new ArrayList<>())
                         .build()
         );
     }

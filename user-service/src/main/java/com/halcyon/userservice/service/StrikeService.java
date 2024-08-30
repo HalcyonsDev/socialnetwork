@@ -1,7 +1,7 @@
 package com.halcyon.userservice.service;
 
 import com.halcyon.jwtlibrary.AuthProvider;
-import com.halcyon.userservice.dto.StrikeRequestDto;
+import com.halcyon.userservice.dto.CreateStrikeDto;
 import com.halcyon.userservice.exception.StrikeAlreadyExistsException;
 import com.halcyon.userservice.model.Strike;
 import com.halcyon.userservice.model.User;
@@ -21,10 +21,13 @@ public class StrikeService {
     private final UserService userService;
     private final AuthProvider authProvider;
 
-    public Strike create(StrikeRequestDto dto) {
+    private static final String BANNED_OWNER_MESSAGE = "You are banned.";
+    private static final String UNVERIFIED_OWNER_MESSAGE = "You are not verified. Please confirm your email.";
+
+    public Strike create(CreateStrikeDto dto) {
         User owner = userService.findByEmail(authProvider.getSubject());
-        isUserVerified(owner, "You are not verified. Please confirm your email.");
-        isUserBanned(owner, "You are banned.");
+        isUserVerified(owner, UNVERIFIED_OWNER_MESSAGE);
+        isUserBanned(owner, BANNED_OWNER_MESSAGE);
 
         User target = userService.findByEmail(dto.getTargetEmail());
         isUserBanned(target, "This user is already banned.");
@@ -43,15 +46,15 @@ public class StrikeService {
 
     public List<Strike> getSentStrikes() {
         User owner = userService.findByEmail(authProvider.getSubject());
-        isUserBanned(owner, "You are banned.");
-        isUserVerified(owner, "You are not verified. Please confirm your email.");
+        isUserBanned(owner, BANNED_OWNER_MESSAGE);
+        isUserVerified(owner, UNVERIFIED_OWNER_MESSAGE);
 
         return strikeRepository.findAllByOwner(owner);
     }
 
     public List<Strike> getSentMeStrikes() {
         User target = userService.findByEmail(authProvider.getSubject());
-        isUserBanned(target, "You are banned.");
+        isUserBanned(target, BANNED_OWNER_MESSAGE);
 
         return strikeRepository.findAllByTarget(target);
     }
