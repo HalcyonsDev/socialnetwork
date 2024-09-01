@@ -73,6 +73,7 @@ class StrikeServiceTests {
         Strike returnedStrike = strikeService.create(getCreateStrikeDto());
         Strike strike = getStrike();
 
+        assertThat(returnedStrike).isNotNull();
         assertThat(returnedStrike.getOwner()).isEqualTo(strike.getOwner());
         assertThat(returnedStrike.getTarget()).isEqualTo(strike.getTarget());
         assertThat(returnedStrike.getCause()).isEqualTo(strike.getCause());
