@@ -7,8 +7,11 @@ import com.halcyon.userservice.exception.SubscriptionNotFoundException;
 import com.halcyon.userservice.model.Subscription;
 import com.halcyon.userservice.model.User;
 import com.halcyon.userservice.repository.SubscriptionRepository;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +22,9 @@ import static com.halcyon.userservice.util.UserUtil.isUserVerified;
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {
+    @Value("${private.secret}")
+    private String privateSecret;
+
     private final SubscriptionRepository subscriptionRepository;
     private final UserService userService;
     private final AuthProvider authProvider;
@@ -95,5 +101,18 @@ public class SubscriptionService {
 
         User target = userService.findById(targetId);
         return subscriptionRepository.findAllByTarget(target);
+    }
+
+    public List<Integer> getIdOfUsersSubscribedByUser(long ownerId, String authSecretKey) {
+        isValidPrivateSecret(authSecretKey);
+
+        User owner = userService.findById(ownerId);
+        return subscriptionRepository.findIdOfUsersSubscribedByUser(owner);
+    }
+
+    private void isValidPrivateSecret(String authSecretKey) {
+        if (StringUtils.isBlank(authSecretKey) || !authSecretKey.equals(privateSecret)) {
+            throw new BadCredentialsException("Bad Request Header Credentials.");
+        }
     }
 }

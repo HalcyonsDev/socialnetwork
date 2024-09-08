@@ -1,4 +1,4 @@
-package com.halcyon.clients.subscribe;
+package com.halcyon.clients.subscription;
 
 import com.halcyon.clients.user.UserResponse;
 import lombok.AllArgsConstructor;

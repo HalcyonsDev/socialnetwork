@@ -1,10 +1,7 @@
 package com.halcyon.mediaservice.payload;
 
-import com.halcyon.clients.subscribe.SubscriptionResponse;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.halcyon.clients.subscription.SubscriptionResponse;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +9,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class NewPostMessage {
     private Long postId;
     private List<SubscriptionResponse> subscribers;

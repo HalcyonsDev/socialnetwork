@@ -12,11 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreatePostDto {
-    @Size(min = 1, max = 100, message = "Title must be more than 1 character and less than 100 characters.")
-    @NotBlank(message = "Title is required")
+    @Size(min = 2, max = 100, message = "Title must be more than 1 character and less than 100 characters.")
+    @NotBlank(message = "Title is required.")
     private String title;
 
-    @Size(min = 1, max = 5000, message = "Content must be more than 1 character and less than 5000 characters.")
-    @NotBlank(message = "Content is required")
+    @Size(min = 2, max = 5000, message = "Content must be more than 1 character and less than 5000 characters.")
+    @NotBlank(message = "Content is required.")
     private String content;
 }

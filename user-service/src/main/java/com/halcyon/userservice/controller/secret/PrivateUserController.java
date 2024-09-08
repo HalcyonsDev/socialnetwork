@@ -1,4 +1,4 @@
-package com.halcyon.userservice.controller;
+package com.halcyon.userservice.controller.secret;
 
 import com.halcyon.userservice.dto.RegisterOAuth2UserDto;
 import com.halcyon.userservice.dto.UpdateOAuth2UserDto;

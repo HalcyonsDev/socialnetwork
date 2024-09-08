@@ -1,6 +1,6 @@
 package com.halcyon.notificationservice.payload;
 
-import com.halcyon.clients.subscribe.SubscriptionResponse;
+import com.halcyon.clients.subscription.SubscriptionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

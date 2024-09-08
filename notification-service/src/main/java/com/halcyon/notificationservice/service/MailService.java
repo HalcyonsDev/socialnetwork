@@ -1,6 +1,6 @@
 package com.halcyon.notificationservice.service;
 
-import com.halcyon.clients.subscribe.SubscriptionResponse;
+import com.halcyon.clients.subscription.SubscriptionResponse;
 import com.halcyon.clients.user.UserClient;
 import com.halcyon.notificationservice.payload.*;
 import com.halcyon.notificationservice.util.EmailUtil;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MailService {
-    @Value("${spring.mail.username")
+    @Value("${spring.mail.username}")
     private String fromEmail;
 
     @Value("${private.secret}")
