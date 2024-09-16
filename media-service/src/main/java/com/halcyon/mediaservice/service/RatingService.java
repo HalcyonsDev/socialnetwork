@@ -4,6 +4,7 @@ import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
 import com.halcyon.jwtlibrary.AuthProvider;
 import com.halcyon.mediaservice.dto.CreateRatingDto;
+import com.halcyon.mediaservice.dto.PostRatingsResponse;
 import com.halcyon.mediaservice.dto.UpdateRatingDto;
 import com.halcyon.mediaservice.exception.RatingAlreadyExistsException;
 import com.halcyon.mediaservice.exception.RatingForbiddenException;
@@ -32,16 +33,18 @@ public class RatingService {
     private final UserClient userClient;
     private final PostService postService;
 
+    private static final String BANNED_USER_MESSAGE = "You are banned.";
+
     public Rating create(CreateRatingDto dto) {
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
+        isUserBanned(user, BANNED_USER_MESSAGE);
+        isUserVerified(user, "You are not verified. Please confirm your email.");
+
         Post post = postService.findById(dto.getPostId());
 
         if (ratingRepository.existsByOwnerIdAndPost(user.getId(), post)) {
             throw new RatingAlreadyExistsException();
         }
-
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
 
         Rating rating = new Rating(dto.getIsLike(), user.getId(), post);
         rating = ratingRepository.save(rating);
@@ -56,18 +59,23 @@ public class RatingService {
         return rating;
     }
 
-    public Rating findById(long ratingId) {
+    public Rating getById(long ratingId) {
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
 
+        return findById(ratingId);
+    }
+
+    public Rating findById(long ratingId) {
         return ratingRepository.findById(ratingId)
                 .orElseThrow(RatingNotFoundException::new);
     }
 
     public String delete(long ratingId) {
-        Rating rating = findById(ratingId);
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
+
+        Rating rating = findById(ratingId);
 
         if (rating.getOwnerId() != user.getId()) {
             throw new RatingForbiddenException();
@@ -88,7 +96,7 @@ public class RatingService {
 
     public Rating changeType(UpdateRatingDto dto) {
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
 
         Rating rating = findById(dto.getRatingId());
         boolean lastType = rating.isLike();
@@ -114,21 +122,14 @@ public class RatingService {
         return rating;
     }
 
-    public Page<Rating> findLikesInPost(long postId, int offset, int limit) {
-        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
-
-        Post post = postService.findById(postId);
-        return ratingRepository.findAllByPostAndIsLike(post, true,
-                PageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "createdAt")));
+    public PostRatingsResponse getRatingsCountInPost(long postId) {
+        Post post = postService.getById(postId);
+        return new PostRatingsResponse(postId, post.getLikesCount(), post.getDislikesCount());
     }
 
-    public Page<Rating> findDislikesInPost(long postId, int offset, int limit) {
-        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
-
-        Post post = postService.findById(postId);
-        return ratingRepository.findAllByPostAndIsLike(post, false,
+    public Page<Rating> findRatingsInPost(long postId, boolean isLike, int offset, int limit) {
+        Post post = postService.getById(postId);
+        return ratingRepository.findAllByPostAndIsLike(post, isLike,
                 PageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 }

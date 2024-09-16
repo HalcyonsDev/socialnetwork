@@ -1,6 +1,7 @@
 package com.halcyon.mediaservice.controller;
 
 import com.halcyon.mediaservice.dto.CreateRatingDto;
+import com.halcyon.mediaservice.dto.PostRatingsResponse;
 import com.halcyon.mediaservice.dto.UpdateRatingDto;
 import com.halcyon.mediaservice.model.Rating;
 import com.halcyon.mediaservice.service.RatingService;
@@ -24,7 +25,7 @@ public class RatingController {
 
     @GetMapping("/{ratingId}")
     public ResponseEntity<Rating> getById(@PathVariable long ratingId) {
-        Rating rating = ratingService.findById(ratingId);
+        Rating rating = ratingService.getById(ratingId);
         return ResponseEntity.ok(rating);
     }
 
@@ -40,23 +41,29 @@ public class RatingController {
         return ResponseEntity.ok(rating);
     }
 
-    @GetMapping("/likes/{postId}")
+    @GetMapping("/post/{postId}")
+    public ResponseEntity<PostRatingsResponse> getRatingsCountsInPost(@PathVariable long postId) {
+        PostRatingsResponse postRatingsResponse = ratingService.getRatingsCountInPost(postId);
+        return ResponseEntity.ok(postRatingsResponse);
+    }
+
+    @GetMapping("/likes/post/{postId}")
     public ResponseEntity<Page<Rating>> getLikesInPost(
             @PathVariable long postId,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "limit", defaultValue = "5") int limit
+            @RequestParam(value = "limit", defaultValue = "10") int limit
     ) {
-        Page<Rating> likes = ratingService.findLikesInPost(postId, offset, limit);
+        Page<Rating> likes = ratingService.findRatingsInPost(postId, true, offset, limit);
         return ResponseEntity.ok(likes);
     }
 
-    @GetMapping("/dislikes/{postId}")
+    @GetMapping("/dislikes/post/{postId}")
     public ResponseEntity<Page<Rating>> getDisLikesInPost(
             @PathVariable long postId,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "limit", defaultValue = "5") int limit
+            @RequestParam(value = "limit", defaultValue = "10") int limit
     ) {
-        Page<Rating> likes = ratingService.findDislikesInPost(postId, offset, limit);
+        Page<Rating> likes = ratingService.findRatingsInPost(postId, false, offset, limit);
         return ResponseEntity.ok(likes);
     }
 }
