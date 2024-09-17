@@ -108,6 +108,12 @@ public class RatingService {
         rating.setLike(dto.getIsLike());
         rating = ratingRepository.save(rating);
 
+        setCountOfRatingsInPost(rating, lastType);
+
+        return rating;
+    }
+
+    private void setCountOfRatingsInPost(Rating rating, boolean lastType) {
         Post post = rating.getPost();
         if (lastType && !rating.isLike()) {
             post.setLikesCount(post.getLikesCount() - 1);
@@ -118,8 +124,6 @@ public class RatingService {
             post.setLikesCount(post.getLikesCount() + 1);
             postService.save(post);
         }
-
-        return rating;
     }
 
     public PostRatingsResponse getRatingsCountInPost(long postId) {

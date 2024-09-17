@@ -3,7 +3,7 @@ package com.halcyon.mediaservice.service;
 import com.halcyon.clients.user.PrivateUserResponse;
 import com.halcyon.clients.user.UserClient;
 import com.halcyon.jwtlibrary.AuthProvider;
-import com.halcyon.mediaservice.dto.CreateCommentByParentDto;
+import com.halcyon.mediaservice.dto.CreateChildCommentDto;
 import com.halcyon.mediaservice.dto.CreateCommentDto;
 import com.halcyon.mediaservice.exception.CommentForbiddenException;
 import com.halcyon.mediaservice.exception.CommentNotFoundException;
@@ -30,11 +30,14 @@ public class CommentService {
     private final UserClient userClient;
     private final PostService postService;
 
+    private static final String BANNED_USER_MESSAGE = "You are banned.";
+    private static final String UNVERIFIED_USER_MESSAGE = "You are not verified. Please confirm your email.";
+
     public Comment create(CreateCommentDto dto) {
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
 
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
+        isUserVerified(user, UNVERIFIED_USER_MESSAGE);
 
         Post post = postService.findById(dto.getPostId());
         Comment comment = Comment.builder()
@@ -46,11 +49,11 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public Comment create(CreateCommentByParentDto dto) {
+    public Comment create(CreateChildCommentDto dto) {
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
 
-        isUserBanned(user, "You are banned.");
-        isUserVerified(user, "You are not verified. Please confirm your email.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
+        isUserVerified(user, UNVERIFIED_USER_MESSAGE);
 
         Comment parent = findById(dto.getParentId());
 
@@ -66,7 +69,7 @@ public class CommentService {
 
     public String delete(long commentId) {
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
 
         Comment comment = findById(commentId);
 
@@ -78,19 +81,20 @@ public class CommentService {
         return "The comment was successfully deleted";
     }
 
-    public Comment findById(long commentId) {
+    public Comment getById(long commentId) {
         PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
+        isUserBanned(user, BANNED_USER_MESSAGE);
 
+        return findById(commentId);
+    }
+
+    public Comment findById(long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
     }
 
     public List<Comment> findAllByPost(long postId) {
-        PrivateUserResponse user = userClient.getByEmail(authProvider.getSubject(), privateSecret);
-        isUserBanned(user, "You are banned.");
-
-        Post post = postService.findById(postId);
+        Post post = postService.getById(postId);
         return commentRepository.findAllByPost(post);
     }
 }

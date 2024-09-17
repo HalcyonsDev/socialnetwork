@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCommentByParentDto {
+public class CreateChildCommentDto {
     private long parentId;
 
     @Size(min = 1, max = 500, message = "Content must be more than 1 character and less than 500 characters.")
