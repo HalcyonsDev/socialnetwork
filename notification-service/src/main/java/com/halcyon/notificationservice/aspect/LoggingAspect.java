@@ -23,21 +23,21 @@ public class LoggingAspect {
         );
     }
 
-    @AfterReturning(pointcut = "execution(* com.halcyon.notificationservice.service.*.*(..))", returning = "result")
-    public void logServiceMethodReturn(JoinPoint joinPoint, Object result) {
+    @AfterReturning(pointcut = "execution(* com.halcyon.notificationservice.service.*.*(..))", returning = "returnedValue")
+    public void logServiceMethodReturn(JoinPoint joinPoint, Object returnedValue) {
         log.info(
                 "Method {} returned {}",
                 joinPoint.getSignature().getName(),
-                result
+                returnedValue
         );
     }
 
-    @AfterThrowing(pointcut = "execution(* com.halcyon.notificationservice.service.*.*(..))", throwing = "ex")
-    public void logServiceMethodThrow(JoinPoint joinPoint, Exception ex) {
+    @AfterThrowing(pointcut = "execution(* com.halcyon.notificationservice.service.*.*(..))", throwing = "thrownException")
+    public void logServiceMethodThrow(JoinPoint joinPoint, Exception thrownException) {
         log.info(
-                "Method {} throw exception {}",
+                "Method {} threw exception {}",
                 joinPoint.getSignature().getName(),
-                ex.getMessage()
+                thrownException.getMessage()
         );
     }
 }

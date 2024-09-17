@@ -1,4 +1,4 @@
-package com.halcyon.authservice.aspect;
+package com.halcyon.chatservice.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 @Aspect
 @Slf4j
 public class LoggingAspect {
-    @Before("execution(* com.halcyon.authservice.service.*.*(..))")
+    @Before("execution(* com.halcyon.chatservice.service.*.*(..))")
     public void logServiceMethodCall(JoinPoint joinPoint) {
         log.info(
                 "Method {} called with arguments {}",
@@ -23,7 +23,7 @@ public class LoggingAspect {
         );
     }
 
-    @AfterReturning(pointcut = "execution(* com.halcyon.authservice.service.*.*(..))", returning = "returnedValue")
+    @AfterReturning(pointcut = "execution(* com.halcyon.chatservice.service.*.*(..))", returning = "returnedValue")
     public void logServiceMethodReturn(JoinPoint joinPoint, Object returnedValue) {
         log.info(
                 "Method {} returned {}",
@@ -32,7 +32,7 @@ public class LoggingAspect {
         );
     }
 
-    @AfterThrowing(pointcut = "execution(* com.halcyon.authservice.service.*.*(..))", throwing = "thrownException")
+    @AfterThrowing(pointcut = "execution(* com.halcyon.chatservice.service.*.*(..))", throwing = "thrownException")
     public void logServiceMethodThrow(JoinPoint joinPoint, Exception thrownException) {
         log.info(
                 "Method {} threw exception {}",
@@ -41,3 +41,4 @@ public class LoggingAspect {
         );
     }
 }
+
