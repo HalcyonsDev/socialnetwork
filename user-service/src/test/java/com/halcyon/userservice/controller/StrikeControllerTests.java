@@ -16,6 +16,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -246,24 +248,25 @@ class StrikeControllerTests {
     void getSentStrikes() throws Exception {
         Strike strike = createStrike(owner, target);
 
-        sendGetSentStrikesRequest()
+        sendGetRequest("/api/v1/strikes/sent")
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(strike.getId()));
     }
 
-    private ResultActions sendGetSentStrikesRequest() throws Exception {
-        return mockMvc.perform(get("/api/v1/strikes/sent")
+    private ResultActions sendGetRequest(String url) throws Exception {
+        return mockMvc.perform(get(url)
                 .header(AUTH_HEADER, getBearerToken()));
     }
 
-    @Test
-    void getSentStrikes_bannedOwner() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/v1/strikes/sent", "/api/v1/strikes/me"})
+    void bannedOwner(String url) throws Exception {
         owner.setBanned(true);
         userRepository.save(owner);
 
         isValidExceptionResponse(
-                sendGetSentStrikesRequest(),
+                sendGetRequest(url),
                 BANNED_OWNER_MESSAGE
         );
 
@@ -276,7 +279,7 @@ class StrikeControllerTests {
         userRepository.save(owner);
 
         isValidExceptionResponse(
-                sendGetSentStrikesRequest(),
+                sendGetRequest("/api/v1/strikes/sent"),
                 UNVERIFIED_OWNER_MESSAGE
         );
 
@@ -287,27 +290,9 @@ class StrikeControllerTests {
     void getSentMeStrikes() throws Exception {
         Strike strike = createStrike(target, owner);
 
-        sendGetSentMeStrikesRequest()
+        sendGetRequest("/api/v1/strikes/me")
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(strike.getId()));
-    }
-
-    private ResultActions sendGetSentMeStrikesRequest() throws Exception {
-        return mockMvc.perform(get("/api/v1/strikes/me")
-                .header(AUTH_HEADER, getBearerToken()));
-    }
-
-    @Test
-    void getSentMeStrikes_bannedOwner() throws Exception {
-        owner.setBanned(true);
-        userRepository.save(owner);
-
-        isValidExceptionResponse(
-                sendGetSentMeStrikesRequest(),
-                BANNED_OWNER_MESSAGE
-        );
-
-        owner.setBanned(false);
     }
 }

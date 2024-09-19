@@ -16,6 +16,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -271,16 +273,16 @@ class SubscriptionControllerTests {
 
     @Test
     void getById() throws Exception {
-        Subscription savedSubscription = saveSubscription();
+        long savedSubscriptionId = saveSubscription().getId();
 
-        sendGetByIdRequest(savedSubscription.getId())
+        sendGetRequest("/api/v1/subscriptions/" + savedSubscriptionId)
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("id").value(savedSubscription.getId()));
+                .andExpect(jsonPath("id").value(savedSubscriptionId));
     }
 
-    private ResultActions sendGetByIdRequest(long subscriptionId) throws Exception {
-        return mockMvc.perform(get("/api/v1/subscriptions/" + subscriptionId)
+    private ResultActions sendGetRequest(String url) throws Exception {
+        return mockMvc.perform(get(url)
                 .header(AUTH_HEADER, getBearerToken()));
     }
 
@@ -290,9 +292,20 @@ class SubscriptionControllerTests {
         userRepository.save(target);
 
         isValidExceptionResponse(
-                sendGetByIdRequest(1),
+                sendGetRequest("/api/v1/subscriptions/1"),
                 SUBSCRIPTION_ID_NOT_FOUND_MESSAGE
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/v1/subscriptions/1", "/api/v1/subscriptions", "/api/v1/subscriptions/owner/1", "/api/v1/subscriptions/subscribers/target/1", "/api/v1/subscriptions/subscribers"})
+    void bannedUser(String url) throws Exception {
+        owner.setBanned(true);
+        userRepository.save(owner);
+
+        isValidExceptionResponse(sendGetRequest(url), BANNED_USER_MESSAGE);
+
+        owner.setBanned(false);
     }
 
     @Test
@@ -301,7 +314,7 @@ class SubscriptionControllerTests {
         userRepository.save(owner);
 
         isValidExceptionResponse(
-                sendGetByIdRequest(1),
+                sendGetRequest("/api/v1/subscriptions/1"),
                 BANNED_USER_MESSAGE
         );
 
@@ -312,29 +325,11 @@ class SubscriptionControllerTests {
     void getSubscriptions() throws Exception {
         Subscription savedSubscription = saveSubscription();
 
-        sendGetSubscriptionsRequest()
+        sendGetRequest("/api/v1/subscriptions")
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$[0].id").value(savedSubscription.getId()));
-    }
-
-    private ResultActions sendGetSubscriptionsRequest() throws Exception {
-        return mockMvc.perform(get("/api/v1/subscriptions")
-                .header(AUTH_HEADER, getBearerToken()));
-    }
-
-    @Test
-    void getSubscriptions_bannedUser() throws Exception {
-        owner.setBanned(true);
-        userRepository.save(owner);
-
-        isValidExceptionResponse(
-                sendGetSubscriptionsRequest(),
-                BANNED_USER_MESSAGE
-        );
-
-        owner.setBanned(false);
     }
 
     @Test
@@ -343,29 +338,11 @@ class SubscriptionControllerTests {
         User savedTarget = userRepository.save(target);
         Subscription savedSubscription = subscriptionRepository.save(new Subscription(savedOwner, savedTarget));
 
-        sendGetSubscriptionsByOwnerIdRequest(savedOwner.getId())
+        sendGetRequest("/api/v1/subscriptions/owner/" + savedOwner.getId())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$[0].id").value(savedSubscription.getId()));
-    }
-
-    private ResultActions sendGetSubscriptionsByOwnerIdRequest(long ownerId) throws Exception {
-        return mockMvc.perform(get("/api/v1/subscriptions/owner/" + ownerId)
-                .header(AUTH_HEADER, getBearerToken()));
-    }
-
-    @Test
-    void getSubscriptionsByOwnerId_bannedUser() throws Exception {
-        owner.setBanned(true);
-        userRepository.save(owner);
-
-        isValidExceptionResponse(
-                sendGetSubscriptionsByOwnerIdRequest(1),
-                BANNED_USER_MESSAGE
-        );
-
-        owner.setBanned(false);
     }
 
     @Test
@@ -374,29 +351,11 @@ class SubscriptionControllerTests {
         User savedTarget = userRepository.save(target);
         Subscription savedSubscription = subscriptionRepository.save(new Subscription(savedTarget, savedUser));
 
-        sendFindSubscribersRequest()
+        sendGetRequest("/api/v1/subscriptions/subscribers")
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$[0].id").value(savedSubscription.getId()));
-    }
-
-    private ResultActions sendFindSubscribersRequest() throws Exception {
-        return mockMvc.perform(get("/api/v1/subscriptions/subscribers")
-                .header(AUTH_HEADER, getBearerToken()));
-    }
-
-    @Test
-    void findSubscribers_bannedUser() throws Exception {
-        owner.setBanned(true);
-        userRepository.save(owner);
-
-        isValidExceptionResponse(
-                sendFindSubscribersRequest(),
-                BANNED_USER_MESSAGE
-        );
-
-        owner.setBanned(false);
     }
 
     @Test
@@ -405,28 +364,10 @@ class SubscriptionControllerTests {
         User savedTarget = userRepository.save(target);
         Subscription savedSubscription = subscriptionRepository.save(new Subscription(savedOwner, savedTarget));
 
-        sendGetSubscribersByTargetIdRequest(savedTarget.getId())
+        sendGetRequest("/api/v1/subscriptions/subscribers/target/" + savedTarget.getId())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$[0].id").value(savedSubscription.getId()));
-    }
-
-    private ResultActions sendGetSubscribersByTargetIdRequest(long targetId) throws Exception {
-        return mockMvc.perform(get("/api/v1/subscriptions/subscribers/target/" + targetId)
-                .header(AUTH_HEADER, getBearerToken()));
-    }
-
-    @Test
-    void getSubscribersByTargetId_bannedUser() throws Exception {
-        owner.setBanned(true);
-        userRepository.save(owner);
-
-        isValidExceptionResponse(
-                sendGetSubscribersByTargetIdRequest(1),
-                BANNED_USER_MESSAGE
-        );
-
-        owner.setBanned(false);
     }
 }
