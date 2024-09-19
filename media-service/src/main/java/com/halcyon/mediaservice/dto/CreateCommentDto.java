@@ -13,6 +13,6 @@ import lombok.Setter;
 public class CreateCommentDto {
     private long postId;
 
-    @Size(min = 1, max = 500, message = "Content must be more than 1 character and less than 500 characters.")
+    @Size(min = 2, max = 500, message = "Content must be more than 1 character and less than 500 characters.")
     private String content;
 }

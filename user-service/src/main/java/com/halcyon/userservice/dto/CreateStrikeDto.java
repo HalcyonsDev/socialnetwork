@@ -14,7 +14,7 @@ import lombok.Setter;
 public class CreateStrikeDto {
     private String targetEmail;
 
-    @Size(min = 1, max = 100, message = "Cause must be more than 1 character and less than 500 characters.")
+    @Size(min = 2, max = 100, message = "Cause must be more than 1 character and less than 500 characters.")
     @NotBlank(message = "Cause is required.")
     private String cause;
 }

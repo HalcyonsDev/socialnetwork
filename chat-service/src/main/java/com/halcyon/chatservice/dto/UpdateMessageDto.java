@@ -14,7 +14,7 @@ import lombok.Setter;
 public class UpdateMessageDto {
     private long messageId;
 
-    @Size(min = 1, max = 1000, message = "Content must be more than 1 character and less than 1000 characters.")
+    @Size(min = 2, max = 1000, message = "Content must be more than 1 character and less than 1000 characters.")
     @NotBlank(message = "Content is required.")
     private String content;
 }

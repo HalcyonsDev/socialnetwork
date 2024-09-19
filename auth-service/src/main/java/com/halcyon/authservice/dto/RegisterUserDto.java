@@ -16,12 +16,12 @@ public class RegisterUserDto {
     @NotBlank(message = "Email is required.")
     private String email;
 
-    @Size(min = 1, max = 100, message = "Username must be more than 1 character and less than 100 characters.")
+    @Size(min = 2, max = 100, message = "Username must be more than 1 character and less than 100 characters.")
     @Pattern(regexp = "^[A-Za-z][A-Za-z0-9 ]+", message = "Username must start with an alphabet and contain only letters, digits, and spaces.")
     @NotBlank(message = "Username is required.")
     private String username;
 
-    @Size(min = 1, max = 500, message = "\"About me\" must be more than 1 character and less than 500 characters.")
+    @Size(min = 2, max = 500, message = "\"About me\" must be more than 1 character and less than 500 characters.")
     private String about;
 
     @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters long.")
