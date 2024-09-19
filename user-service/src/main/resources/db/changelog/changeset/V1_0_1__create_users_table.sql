@@ -1,7 +1,7 @@
 -- =========================================
 -- Description: Create the users table
 -- Author: Halcyon
--- Version: V1.0.0
+-- Version: V1.0.1
 -- =========================================
 
 CREATE TABLE IF NOT EXISTS users (
@@ -16,4 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
     is_using_2fa BOOLEAN NOT NULL,
     auth_provider VARCHAR(20) NOT NULL,
     secret VARCHAR(300)
-)
+);
+
+CREATE UNIQUE INDEX idx_email ON users (email);
