@@ -4,7 +4,7 @@
 
 The application is an implementation of a social network with the following functionality:
 
-- **Authentication.** Users have the opportunity to register, login, logout, use third-party services sucha as Google, GitHub, etc. to create an account, enable two-factor authentication.
+- **Authentication.** Users have the opportunity to register, login, logout, use third-party services such as Google, GitHub, etc. to create an account, enable two-factor authentication.
 - **User Account.** Users have the opportunity to create and change their data, including password and email, which can be changed via email message, upload avatars. They must confirm email when changing it or creating an account.
 - **Subscriptions, strikes.** Users can subscribe and send strikes at each other with an explanation of the reason. Users with a large number of strikes are banned.
 - **Media.** Users can create posts, rate, comment on and read them. There is also a feed logic with subscribers posts.
